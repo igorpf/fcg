@@ -4,7 +4,8 @@
 		<title>Trabalho final de FCG</title>
 
 		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-
+                <script src="js/player.js"></script>
+                
 <script type="text/javascript">
 
     var gl;
@@ -19,13 +20,15 @@
             alert("Could not initialise WebGL, sorry :-(");
         }
         else{
-        	var extensions = gl.getSupportedExtensions();
-        	console.log(extensions);
+//        	var extensions = gl.getSupportedExtensions();
+//        	console.log(extensions);
         }
     }
 
     function drawScene() {
-        
+        var p = new Player(1,2,"");
+        p.move(Directions.UP);
+        console.log(p.y);
     }
 
     function webGLStart() {
@@ -43,7 +46,12 @@
 
 	</head>
 	<body onload="webGLStart();">
-		<canvas id="gl" style="border: none;" width="500" height="500"></canvas>
+                <h1>Dig Dug2</h1>
+                <h3>Arquivo obj</h3>
+                <input type="file" id="fileinput" />
+                <br/><br/>
+                <canvas id="gl" style="border: none;" width="500" height="500">
+                </canvas>
 	</body>
 
 </html>
