@@ -19,3 +19,44 @@ var Color = function(r,g,b){
     };
 };
 
+function renderMap(map){
+    for(var i=0;i<map.length;++i)
+        for(var j=0;j<map.length;++j)
+            renderElement(map[i][j]);
+}
+function renderElement(e){
+    switch(e){
+        case 'empty':
+            break;
+        case 'block':
+            break;
+        case 'crack':
+            break;
+        case 'hole':
+            break;
+        case 'enemy':
+            break;
+        case 'player':
+            break;
+        default:
+            throw new Exception("Element not existent");
+            break;
+    }
+}
+function floodFill(x, y){
+	if(alreadyFilled(x, y)) return;
+	fill(x, y);
+
+	floodFill(x,   y-1);
+	floodFill(x+1, y  );
+	floodFill(x,   y+1);
+	floodFill(x-1, y  );
+}
+//TODO: implement funcions
+function fill(x, y){
+	// this function will actually change the color of our box
+}
+
+function alreadyFilled(x, y){
+	// this functions checks to see if our square has been filled already
+}

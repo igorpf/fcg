@@ -8,7 +8,8 @@ $(function(){
 	var axis = new THREE.AxisHelper(10);
 	scene.add(axis);
         
-	var cubeGeometry = new THREE.BoxGeometry(5,5,5);
+//	var cubeGeometry = new THREE.BoxGeometry(5,5,5);
+	var cubeGeometry = new THREE.CircleGeometry(5,32);
 	var cubeMaterials = new THREE.MeshBasicMaterial({color:0xdddddd, wireframe: true});
 	var cube = new THREE.Mesh( cubeGeometry, cubeMaterials);
 	cube.position.x = 0;
@@ -16,8 +17,8 @@ $(function(){
 	cube.position.z = 0;
 
 	scene.add(cube);
-	camera.position.x = 40;
-	camera.position.y = 40;
+	camera.position.x = 0;
+	camera.position.y = 0;
 	camera.position.z = 40;
         
 	camera.lookAt(scene.position);

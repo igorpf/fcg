@@ -3,8 +3,9 @@ var inputElement2 = document.getElementById("input2");
 //quando escolher o arquivo, já carrega o mapa do jogo
 inputElement.addEventListener("change", handleFiles, false);
 inputElement2.addEventListener("change", handleFiles, false);
-
+var src;
 function handleFiles(e) {
+    src = e.srcElement.id;
     var file = e.target.files[0];
     var reader = new FileReader();
     reader.addEventListener("load",
@@ -15,35 +16,46 @@ function handleFiles(e) {
 
 var numberToColorDict = {};
 var numberToType = {};
-var map;
+var mapInferior;
+var mapSuperior;
 function processimage(e) {
     var buffer = e.target.result;
     var bitmap = getBMP(buffer);
-
     var size = 20;
-    map = new Array(size);
+    initializeMaps(size);
+    initializeDictionaries();
     for (var i = 0; i < size; ++i)
-        map[i] = new Array(size);
+        for (var j = 0; j < size; ++j) {
+            var index = 3 * (i * size + j);
+            var color = new Color(bitmap.pixels[index + 2],
+                    bitmap.pixels[index + 1],
+                    bitmap.pixels[index]);
 
+            for (var k in numberToColorDict)
+                if (numberToColorDict[k].equals(color))
+                    if (src === "input1")
+                        mapInferior[i][j] = k;
+                    else
+                        mapSuperior[i][j] = k;
+        }
+}
+function initializeMaps(size) {
+    mapInferior = new Array(size);
+    mapSuperior = new Array(size);
+    for (var i = 0; i < size; ++i) {
+        mapInferior[i] = new Array(size);
+        mapSuperior[i] = new Array(size);
+    }
+}
+function initializeDictionaries() {
     var c = new Color(0, 0, 0);
     var index = 0;
     for (var i in c.colors()) {
         numberToColorDict[index] = c.colors()[i];
         numberToType[index++] = i;
     }
-
-    for (var i = 0; i < size; ++i)
-        for (var j = 0; j < size; ++j) {
-            var index = 3 * (i * size + j);
-            var color = new Color(bitmap.pixels[index+2],
-                            bitmap.pixels[index + 1],
-                            bitmap.pixels[index]);
-                            
-                for (var k in numberToColorDict)
-                    if (numberToColorDict[k].equals(color))
-                        map[i][j] = k;
-        }
 }
+
 function getBMP(buffer) {
     var datav = new DataView(buffer);
     var bitmap = {};
