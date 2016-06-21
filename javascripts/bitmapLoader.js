@@ -1,6 +1,8 @@
-var inputElement = document.getElementById("input");
+var inputElement = document.getElementById("input1");
+var inputElement2 = document.getElementById("input2");
 //quando escolher o arquivo, já carrega o mapa do jogo
 inputElement.addEventListener("change", handleFiles, false);
+inputElement2.addEventListener("change", handleFiles, false);
 
 function handleFiles(e) {
     var file = e.target.files[0];
@@ -13,12 +15,13 @@ function handleFiles(e) {
 
 var numberToColorDict = {};
 var numberToType = {};
+var map;
 function processimage(e) {
     var buffer = e.target.result;
     var bitmap = getBMP(buffer);
 
     var size = 20;
-    var map = new Array(size);
+    map = new Array(size);
     for (var i = 0; i < size; ++i)
         map[i] = new Array(size);
 
@@ -39,13 +42,7 @@ function processimage(e) {
                 for (var k in numberToColorDict)
                     if (numberToColorDict[k].equals(color))
                         map[i][j] = k;
-                
-            
         }
-    console.log(numberToType);
-    console.log(numberToColorDict);
-    console.log(map);
-
 }
 function getBMP(buffer) {
     var datav = new DataView(buffer);
