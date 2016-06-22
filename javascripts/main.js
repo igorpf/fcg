@@ -52,6 +52,14 @@ function update() {
     if (keyboard.pressed("3")) {
         activeCamera = 3;
     }
+    var relativeCameraOffset = new THREE.Vector3(20, 50, 50);
+
+    var cameraOffset = relativeCameraOffset.applyMatrix4(cube.matrixWorld);
+
+    chaseCamera.position.x = cameraOffset.x;
+    chaseCamera.position.y = cameraOffset.y;
+    chaseCamera.position.z = cameraOffset.z;
+    chaseCamera.lookAt(cube.position);
 }
 function render() {
     switch (activeCamera) {
