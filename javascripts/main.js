@@ -32,7 +32,7 @@ function init() {
     chaseCamera.position.y = 0;
     chaseCamera.position.z = 40;
 
-    perspCamera.lookAt(scene.position);orto
+    perspCamera.lookAt(scene.position);
     $('#scene-container').append(renderer.domElement);
     renderer.render(scene, perspCamera);
 }
