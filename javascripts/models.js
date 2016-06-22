@@ -5,7 +5,7 @@ var Player = function() {
 	var player_object;
 	var texture = new THREE.Texture();
 	var posx = 0;
-	var posy = 0;
+	var posy = 5;
 	var posz = 0;
 
 	var direction = {
@@ -64,9 +64,10 @@ var Player = function() {
 
 		object.position.x = posx;
 		object.position.y = posy;
-		object.scale.x = 0.2;
-		object.scale.y = 0.2;
-		object.scale.z = 0.2;
+                var scale=0.05;
+		object.scale.x = scale;
+		object.scale.y = scale;
+		object.scale.z = scale;
 		object.rotation.y = Math.PI;
 		object.rotation.x = 0;
 

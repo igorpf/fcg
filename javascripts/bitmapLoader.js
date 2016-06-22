@@ -1,3 +1,5 @@
+/* global THREE */
+
 var inputElement = document.getElementById("input1");
 var inputElement2 = document.getElementById("input2");
 //quando escolher o arquivo, já carrega o mapa do jogo
@@ -18,12 +20,14 @@ var numberToColorDict = {};
 var numberToType = {};
 var mapInferior;
 var mapSuperior;
+var mapScale = 20;
 function processimage(e) {
     var buffer = e.target.result;
     var bitmap = getBMP(buffer);
     var size = 20;
     initializeMaps(size);
     initializeDictionaries();
+    loadFloor();
     for (var i = 0; i < size; ++i)
         for (var j = 0; j < size; ++j) {
             var index = 3 * (i * size + j);
@@ -33,18 +37,23 @@ function processimage(e) {
 
             for (var k in numberToColorDict)
                 if (numberToColorDict[k].equals(color))
-                    if (src === "input1")
+                    if (src === "input1"){
                         mapInferior[i][j] = k;
+                        setFloorTexture(i,j,k);
+                    }
                     else
                         mapSuperior[i][j] = k;
         }
+    
 }
 function initializeMaps(size) {
     mapInferior = new Array(size);
     mapSuperior = new Array(size);
+    floor = new Array(size);
     for (var i = 0; i < size; ++i) {
         mapInferior[i] = new Array(size);
         mapSuperior[i] = new Array(size);
+        floor[i] = new Array(size);
     }
 }
 function initializeDictionaries() {
@@ -55,7 +64,29 @@ function initializeDictionaries() {
         numberToType[index++] = i;
     }
 }
-
+function loadFloor(){
+    grassTexture = new THREE.ImageUtils.loadTexture('obj/floor/grass.jpg');
+    grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
+    grassTexture.repeat.set(10, 10);
+    grassMaterial = new THREE.MeshBasicMaterial({map: grassTexture, side: THREE.DoubleSide});
+    
+    waterTexture = new THREE.ImageUtils.loadTexture('obj/floor/water.jpg');
+    waterTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
+    waterTexture.repeat.set(10, 10);
+    waterMaterial = new THREE.MeshBasicMaterial({map: waterTexture, side: THREE.DoubleSide});
+    floorGeometry = new THREE.PlaneGeometry(20, 20, 10, 10);
+}
+function setFloorTexture( i, j,k){
+    //FLOOR
+    
+    floor[i][j] = new THREE.Mesh(floorGeometry, (numberToType[k]==='empty')?waterMaterial:grassMaterial);
+    floor[i][j].position.x = i*mapScale;
+    floor[i][j].position.z = j*mapScale;
+    floor[i][j].position.y = -0.5;
+    floor[i][j].rotation.x = Math.PI / 2;
+    scene.add(floor[i][j]);
+    //
+}
 function getBMP(buffer) {
     var datav = new DataView(buffer);
     var bitmap = {};
