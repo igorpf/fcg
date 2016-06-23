@@ -1,8 +1,8 @@
 //globais
 var activeCamera = 1;
 var clock = new THREE.Clock();
-var perspCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 500);//(viewangle, aspect, near, far)
-var chaseCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 500);//(viewangle, aspect, near, far)
+var fpCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 500);//(viewangle, aspect, near, far)
+var chaseCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 1200);//(viewangle, aspect, near, far)
 var ortoCamera = new THREE.OrthographicCamera(10, 750 / 2, 10, 780 / - 2, 1, 1000 );
 var keyboard = new THREEx.KeyboardState();
 var axis = new THREE.AxisHelper(10);
@@ -22,6 +22,7 @@ var inputElement = document.getElementById("input1");
 var inputElement2 = document.getElementById("input2");
 var size = 20;
 var src;
+var fpControls = new THREE.PointerLockControls(fpCamera);
 var enemies = new Array(4), enemiesCounter=0;
 /*initalization (THIS MUST BE MADE GLOBALLY)*/
 mapInferior = new Array(size);
@@ -49,9 +50,9 @@ function mainLoop() {
 
 function init() {
     var windowHalfX = container.width() / 2;
-    perspCamera.position.x = 40;
-    perspCamera.position.y = 40;
-    perspCamera.position.z = 0;
+    fpCamera.position.x = 40;
+    fpCamera.position.y = 40;
+    fpCamera.position.z = 0;
     ortoCamera.position.x = 0;
     ortoCamera.position.y = 200;
     ortoCamera.position.z = 0;
@@ -76,7 +77,8 @@ function init() {
     var directionalLight = new THREE.DirectionalLight(0xffeedd);
     directionalLight.position.set(0, 0, 1).normalize();
     scene.add(directionalLight);
-
+//    fpControls.enabled = true;
+//    scene.add(fpControls.getObject());
     player = new Player();
 
 //    this.player = new Player();
@@ -88,7 +90,7 @@ function init() {
     renderer.setClearColor(0x000000);
     renderer.setSize(800, 600);
     renderer.setPixelRatio(window.devicePixelRatio);
-    controls = new THREE.OrbitControls(perspCamera, renderer.domElement);
+    controls = new THREE.OrbitControls(fpCamera, renderer.domElement);
     container.append(renderer.domElement);
 
 }
@@ -110,7 +112,7 @@ function update()
     var delta = clock.getDelta(); // seconds.
     var moveDistance = 50 * delta; // 200 pixels per second
     var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
-
+    
     // local coordinates
 
     // local transformations
@@ -158,7 +160,7 @@ function update()
 function render() {
     switch (activeCamera) {
         case 1:
-            renderer.render(scene, perspCamera);
+            renderer.render(scene, fpCamera);
             break;
         case 2:
             renderer.render(scene, ortoCamera);
@@ -244,7 +246,7 @@ function loadFloor() {
     crackTexture.repeat.set(10, 10);
     crackMaterial = new THREE.MeshBasicMaterial({map: crackTexture, side: THREE.DoubleSide});
 
-    floorGeometry = new THREE.PlaneGeometry(20, 20, 10, 10);
+    floorGeometry = new THREE.PlaneGeometry(20, 20, 1, 1);
 }
 /**
  * 
@@ -256,8 +258,8 @@ function loadFloor() {
 function setFloorTexture(i, j, k) {
     //FLOOR
     floor[i][j] = new THREE.Mesh(floorGeometry, (numberToType[k] === 'empty') ? waterMaterial : grassMaterial);
-    floor[i][j].position.x = i * mapScale;
-    floor[i][j].position.z = j * mapScale;
+    floor[i][j].position.x = i * mapScale+mapScale/2;
+    floor[i][j].position.z = j * mapScale+mapScale/2;
     floor[i][j].position.y = -0.5;
     floor[i][j].rotation.x = Math.PI / 2;
     scene.add(floor[i][j]);
@@ -278,16 +280,16 @@ function setMapObject(i, j, k) {
                 break;
             case 'hole':
                 floor[i][j] = new THREE.Mesh(floorGeometry, holeMaterial);
-                floor[i][j].position.x = x;
-                floor[i][j].position.z = z;
+                floor[i][j].position.x = x+mapScale/2;
+                floor[i][j].position.z = z+mapScale/2;
                 floor[i][j].position.y = -0.5;
                 floor[i][j].rotation.x = Math.PI / 2;
                 scene.add(floor[i][j]);
                 break;
             case 'crack':
                 floor[i][j] = new THREE.Mesh(floorGeometry, crackMaterial);
-                floor[i][j].position.x = x;
-                floor[i][j].position.z = z;
+                floor[i][j].position.x = x+mapScale/2;
+                floor[i][j].position.z = z+mapScale/2;
                 floor[i][j].position.y = -0.5;
                 floor[i][j].rotation.x = Math.PI / 2;
                 scene.add(floor[i][j]);
