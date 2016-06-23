@@ -8,7 +8,9 @@ var keyboard = new THREEx.KeyboardState();
 var axis = new THREE.AxisHelper(10);
 var scene, renderer;
 var player, controls;
+<<<<<<< HEAD
 var monster1;
+=======
 var floor; //geometry/texture 
 var floorGeometry;
 var grassMaterial, grassTexture, waterMaterial, waterTexture;
@@ -36,6 +38,7 @@ for (var i = 0; i < size; ++i) {
 //quando escolher o arquivo, já carrega o mapa do jogo
 
 var src;
+>>>>>>> 82ab4f2dd22f2e1f44dae15ed4230b4b77bbacbf
 
 var container = $('#scene-container');
 
@@ -78,9 +81,14 @@ function init() {
 
     player = new Player();
 
+<<<<<<< HEAD
+	this.player = new Player();
+	player.init(0,0,0);
 
 	this.monster1 = new Monster();
 	monster1.init(0,0,-40);
+=======
+>>>>>>> 82ab4f2dd22f2e1f44dae15ed4230b4b77bbacbf
 
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x000000);
@@ -105,6 +113,34 @@ function animate() {
 
 function update()
 {
+<<<<<<< HEAD
+	var delta = clock.getDelta(); // seconds.
+	var moveDistance = 200 * delta; // 200 pixels per second
+	var rotateAngle = Math.PI / 2 * delta;   // pi/2 radians (90 degrees) per second
+	
+	// local coordinates
+
+	// local transformations
+
+	// move forwards/backwards/left/right
+	if ( keyboard.pressed("W") ){
+		player.checkRotation('up');
+		player.player_object.translateZ( - moveDistance );
+	}
+	if ( keyboard.pressed("S") ){
+		player.checkRotation('down');
+		player.player_object.translateZ(  - moveDistance );
+	}
+	if ( keyboard.pressed("A") ){
+		player.checkRotation('left');
+		player.player_object.translateZ( -moveDistance );
+	}
+	if ( keyboard.pressed("D") ){
+		player.checkRotation('right');
+		
+		player.player_object.translateZ(  - moveDistance );	
+	}
+=======
     var delta = clock.getDelta(); // seconds.
     var moveDistance = 50 * delta; // 50 pixels per second
     var rotateAngle = Math.PI / 0.7 * delta;   // pi/2 radians (90 degrees) per second
@@ -112,21 +148,16 @@ function update()
     if (player.player_object !== undefined) {
 
         if (keyboard.pressed("W")) {
-		player.checkRotation('up');
-		player.player_object.translateZ( - moveDistance );
+            player.player_object.translateZ(-moveDistance);
         }
         if (keyboard.pressed("S")) {
-		player.checkRotation('down');
-		player.player_object.translateZ(  - moveDistance );
+            player.player_object.translateZ(moveDistance);
         }
         if (keyboard.pressed("A")) {
-		player.checkRotation('left');
-		player.player_object.translateZ( -moveDistance );
+            player.player_object.rotateY(rotateAngle);
         }
         if (keyboard.pressed("D")) {
-		player.checkRotation('right');
-		
-		player.player_object.translateZ(  - moveDistance );	
+            player.player_object.rotateY(-rotateAngle);
         }
 
         var relativeCameraOffset = new THREE.Vector3(0, 300, 600);
@@ -138,6 +169,7 @@ function update()
         chaseCamera.lookAt(player.player_object.position);
     }
 
+>>>>>>> 82ab4f2dd22f2e1f44dae15ed4230b4b77bbacbf
     if (keyboard.pressed("1")) {
         activeCamera = 1;
     }
@@ -147,6 +179,12 @@ function update()
     if (keyboard.pressed("3")) {
         activeCamera = 3;
     }
+<<<<<<< HEAD
+    var relativeCameraOffset = new THREE.Vector3(20, 50, 50);
+
+    var cameraOffset = relativeCameraOffset.applyMatrix4(player.matrixWorld);
+=======
+>>>>>>> 82ab4f2dd22f2e1f44dae15ed4230b4b77bbacbf
 
     controls.update();
     stats.update();
@@ -295,6 +333,8 @@ function setMapObject(i, j, k) {
 
 }
 /*----------------------MAP LOADING END-------------------------------------*/
+
+
 
 
 

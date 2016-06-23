@@ -1,11 +1,13 @@
+/* global mapScale */
+
 var Color = function(r,g,b){
     this.r=r;
     this.g=g;
     this.b=b;
     this.colors = function(){
         return {
-            empty: new Color(0, 255, 255), //verde
-            block: new Color(38,255,81), //ciano (azul fraco)
+            empty: new Color(0, 255, 255), //ciano (azul fraco)
+            block: new Color(38,255,81), //verde
             crack: new Color(187, 128, 0), //marrom fraco
             hole: new Color(107, 73, 0), //marrom forte
             enemy: new Color(255, 0, 0), //vermelho
@@ -42,6 +44,17 @@ function renderElement(e){
             throw new Exception("Element not existent");
             break;
     }
+}
+/** Returns a int 2D point indicating in which part of the map the object is present, 
+ *  according to the map scale.
+ *  Eg.: Given map scale = 10 and a point (10.5, 5), this should return (1,0)
+ * @param {float 3D point} position position 
+ * @returns map 
+ */
+function worldToMapCoordinates(position){
+    var point = {};
+    point.x = Math.floor(position.x/mapScale);
+    point.z = Math.floor(position.z/mapScale);
 }
 function floodFill(x, y){
 	if(alreadyFilled(x, y)) return;
