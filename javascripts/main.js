@@ -3,7 +3,7 @@ var activeCamera = 1;
 var clock = new THREE.Clock();
 var perspCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 500);//(viewangle, aspect, near, far)
 var chaseCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 500);//(viewangle, aspect, near, far)
-var ortoCamera = new THREE.OrthographicCamera(0, 400, 400, 0, -20, 500);
+var ortoCamera = new THREE.OrthographicCamera(10, 750 / 2, 10, 780 / - 2, 1, 1000 );
 var keyboard = new THREEx.KeyboardState();
 var axis = new THREE.AxisHelper(10);
 var scene, renderer;
@@ -51,9 +51,9 @@ function init() {
     var windowHalfX = container.width() / 2;
     perspCamera.position.x = 40;
     perspCamera.position.y = 40;
-    perspCamera.position.z = 150;
+    perspCamera.position.z = 0;
     ortoCamera.position.x = 0;
-    ortoCamera.position.y = 400;
+    ortoCamera.position.y = 200;
     ortoCamera.position.z = 0;
     //TODO: fazer a camera se mexer conforme o boneco mexe
     chaseCamera.position.x = 0;
