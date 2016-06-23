@@ -8,6 +8,7 @@ var keyboard = new THREEx.KeyboardState();
 var axis = new THREE.AxisHelper(10);
 var scene, renderer;
 var player, controls;
+var monster1;
 
 var container = $('#scene-container');
 
@@ -48,6 +49,9 @@ function init() {
 
 	this.player = new Player();
 	player.init(0,0,0);
+
+	this.monster1 = new Monster();
+	monster1.init(0,0,-40);
 
 	renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x000000);

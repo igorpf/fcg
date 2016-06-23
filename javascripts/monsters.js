@@ -1,8 +1,8 @@
-//Arquivo responsável por carregar os modelos do player
-var Player = function() {
+//Arquivo responsável por carregar os modelos.
+var Monster = function() {
 	var that = this;
-	var player_loader;
-	var player_object;
+	var monster_loader;
+	var monster_object;
 	var texture = new THREE.Texture();
 	var posx = 0;
 	var posy = 0;
@@ -50,8 +50,7 @@ var Player = function() {
 
 		var loader = new THREE.OBJLoader(manager);
 
-
-		loader.load('obj/be.obj', addObjtoScene);
+		loader.load('obj/WoodenLarry.obj', addObjtoScene);
 
 
 	};
@@ -69,98 +68,99 @@ var Player = function() {
 
 		object.position.x = that.getPosx();
 		object.position.y = that.getPosy();
-		object.scale.x = 0.2;
-		object.scale.y = 0.2;
-		object.scale.z = 0.2;
+		object.scale.x = 15;
+		object.scale.y = 15;
+		object.scale.z = 15;
+		object.rotation.x = 0;
 
-		that.player_object = object;
+		that.monster_object = object;
 
-		scene.add(that.player_object);
+		scene.add(that.monster_object);
 	};
 
-	
-	that.checkRotation = function(new_direction){
-		switch(new_direction){
+
+	that.checkRotation = function(new_direction) {
+		switch (new_direction) {
 			case 'up':
-				if(looking['up'] == true)
+				if (looking['up'] == true)
 					break;
-				else{
-					if(looking['left'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y - (Math.PI/2);
+				else {
+					if (looking['left'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y - (Math.PI / 2);
 						that.setLooking(new_direction, true);
 					}
-					if(looking['right'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y + (Math.PI/2);
+					if (looking['right'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y + (Math.PI / 2);
 						that.setLooking(new_direction, true);
 					}
-					if(looking['down'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y+ Math.PI;
+					if (looking['down'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y + Math.PI;
 						that.setLooking(new_direction, true);
 					}
 
 				}
 
-			break;
+				break;
 			case 'left':
-				if(looking['left'] == true)
+				if (looking['left'] == true)
 					break;
-				else{
-					if(looking['up'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y + (Math.PI/2);
+				else {
+					if (looking['up'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y + (Math.PI / 2);
 						that.setLooking(new_direction, true);
 					}
-					if(looking['down'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y - (Math.PI/2);
+					if (looking['down'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y - (Math.PI / 2);
 						that.setLooking(new_direction, true);
 					}
-					if(looking['right'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y + Math.PI;
+					if (looking['right'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y + Math.PI;
 						that.setLooking(new_direction, true);
 					}
 
 				}
 
-			break;
+				break;
 			case 'right':
-				if(looking['right'] == true)
+				if (looking['right'] == true)
 					break;
-				else{
-					if(looking['up'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y - (Math.PI/2);
+				else {
+					if (looking['up'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y - (Math.PI / 2);
 						that.setLooking(new_direction, true);
 					}
-					if(looking['down'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y + (Math.PI/2);
+					if (looking['down'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y + (Math.PI / 2);
 						that.setLooking(new_direction, true);
 					}
-					if(looking['left'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y + Math.PI;
+					if (looking['left'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y + Math.PI;
 						that.setLooking(new_direction, true);
 					}
 
 				}
 
-			break;
+				break;
 			case 'down':
-				if(looking['down'] == true)
+				if (looking['down'] == true)
 					break;
-				else{
-					if(looking['left'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y + (Math.PI/2);
+				else {
+					if (looking['left'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y + (Math.PI / 2);
 						that.setLooking(new_direction, true);
 					}
-					if(looking['right'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y - (Math.PI/2);
+					if (looking['right'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y - (Math.PI / 2);
 						that.setLooking(new_direction, true);
 					}
-					if(looking['up'] == true){
-						that.player_object.rotation.y = that.player_object.rotation.y + Math.PI;
+					if (looking['up'] == true) {
+						that.monster_object.rotation.y = that.monster_object.rotation.y + Math.PI;
 						that.setLooking(new_direction, true);
 					}
 
 				}
 
-			break;
+				break;
 
 
 
@@ -195,8 +195,6 @@ var Player = function() {
 
 	};
 
-
-
 	//getters
 	that.getRotate = function() {
 		return rotation;
@@ -212,15 +210,15 @@ var Player = function() {
 		return posz;
 	};
 
-	that.getPlayerLoader = function() {
-		return player_loader;
+	that.getMonsterLoader = function() {
+		return monster_loader;
 	};
 
 	that.getLooking = function() {
 		return looking;
 	};
 
-	that.getLookingAt = function(direction){
+	that.getLookingAt = function(direction) {
 		return looking[direction];
 	};
 
