@@ -47,7 +47,7 @@ function init() {
 	scene.add(directionalLight);
 
 	this.player = new Player();
-	player.init();
+	player.init(0,0,0);
 
 	renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x000000);
@@ -82,16 +82,21 @@ function update()
 
 	// move forwards/backwards/left/right
 	if ( keyboard.pressed("W") ){
-		player.player_object.translateZ( -moveDistance );
+		player.checkRotation('up');
+		player.player_object.translateZ( - moveDistance );
 	}
 	if ( keyboard.pressed("S") ){
-		player.player_object.translateZ(  moveDistance );
+		player.checkRotation('down');
+		player.player_object.translateZ(  - moveDistance );
 	}
 	if ( keyboard.pressed("A") ){
-		player.player_object.translateX( -moveDistance );
+		player.checkRotation('left');
+		player.player_object.translateZ( -moveDistance );
 	}
 	if ( keyboard.pressed("D") ){
-		player.player_object.translateX(  moveDistance );	
+		player.checkRotation('right');
+		
+		player.player_object.translateZ(  - moveDistance );	
 	}
     if (keyboard.pressed("1")) {
         activeCamera = 1;
@@ -104,7 +109,7 @@ function update()
     }
     var relativeCameraOffset = new THREE.Vector3(20, 50, 50);
 
-    var cameraOffset = relativeCameraOffset.applyMatrix4(cube.matrixWorld);
+    var cameraOffset = relativeCameraOffset.applyMatrix4(player.matrixWorld);
 
     chaseCamera.position.x = cameraOffset.x;
     chaseCamera.position.y = cameraOffset.y;
@@ -136,5 +141,7 @@ function animate() {
     render();
     update();
 }
+
+
 
 $('#document').ready(mainLoop);
