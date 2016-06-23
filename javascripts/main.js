@@ -8,13 +8,14 @@ var keyboard = new THREEx.KeyboardState();
 var axis = new THREE.AxisHelper(10);
 var scene, renderer;
 var player, controls;
-var floor; //guarda a geometria/textura do chão
+var floor; //geometry/texture 
 var floorGeometry;
 var grassMaterial, grassTexture, waterMaterial, waterTexture;
+var holeMaterial, holeTexture, crackMaterial, crackTexture;
 var numberToColorDict = {};
 var numberToType = {};
-var mapInferior;// guardam só os números
-var mapSuperior;// que representam os objetos
+var mapInferior;// keep only the number
+var mapSuperior;// that represent the object
 var mapObjects;
 var mapScale = 20;
 var inputElement = document.getElementById("input1");
@@ -74,8 +75,8 @@ function init() {
     directionalLight.position.set(0, 0, 1).normalize();
     scene.add(directionalLight);
 
-    this.player = new Player();
-    player.init(0, 5, 0);
+    player = new Player();
+
 
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x000000);
@@ -104,23 +105,30 @@ function update()
     var moveDistance = 50 * delta; // 50 pixels per second
     var rotateAngle = Math.PI / 0.7 * delta;   // pi/2 radians (90 degrees) per second
 
-    // local coordinates
+    if (player.player_object !== undefined) {
 
-    // local transformations
+        if (keyboard.pressed("W")) {
+            player.player_object.translateZ(-moveDistance);
+        }
+        if (keyboard.pressed("S")) {
+            player.player_object.translateZ(moveDistance);
+        }
+        if (keyboard.pressed("A")) {
+            player.player_object.rotateY(rotateAngle);
+        }
+        if (keyboard.pressed("D")) {
+            player.player_object.rotateY(-rotateAngle);
+        }
 
-    // move forwards/backwards/left/right
-    if (keyboard.pressed("W")) {
-        player.player_object.translateZ(-moveDistance);
+        var relativeCameraOffset = new THREE.Vector3(0, 300, 600);
+
+        var cameraOffset = relativeCameraOffset.applyMatrix4(player.player_object.matrixWorld);
+        chaseCamera.position.x = cameraOffset.x;
+        chaseCamera.position.y = cameraOffset.y;
+        chaseCamera.position.z = cameraOffset.z;
+        chaseCamera.lookAt(player.player_object.position);
     }
-    if (keyboard.pressed("S")) {
-        player.player_object.translateZ(moveDistance);
-    }
-    if (keyboard.pressed("A")) {
-        player.player_object.rotateY(rotateAngle);
-    }
-    if (keyboard.pressed("D")) {
-        player.player_object.rotateY(-rotateAngle);
-    }
+
     if (keyboard.pressed("1")) {
         activeCamera = 1;
     }
@@ -130,18 +138,7 @@ function update()
     if (keyboard.pressed("3")) {
         activeCamera = 3;
     }
-    var relativeCameraOffset = new THREE.Vector3(0, 300, 600);
 
-    var cameraOffset = relativeCameraOffset.applyMatrix4(player.player_object.matrixWorld);
-//    var cameraOffset = relativeCameraOffset.add(player.player_object.position);
-
-    chaseCamera.position.x = cameraOffset.x;
-    chaseCamera.position.y = cameraOffset.y;
-    chaseCamera.position.z = cameraOffset.z;
-    chaseCamera.lookAt(player.player_object.position);
-
-
-//console.log(mapObjects[5][17].block_object );
     controls.update();
     stats.update();
 }
@@ -220,9 +217,20 @@ function loadFloor() {
     grassMaterial = new THREE.MeshBasicMaterial({map: grassTexture, side: THREE.DoubleSide});
 
     waterTexture = new THREE.ImageUtils.loadTexture('obj/floor/water.jpg');
-    waterTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
+    waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;
     waterTexture.repeat.set(10, 10);
     waterMaterial = new THREE.MeshBasicMaterial({map: waterTexture, side: THREE.DoubleSide});
+
+    holeTexture = new THREE.ImageUtils.loadTexture('obj/floor/hole.jpg');
+    holeTexture.wrapS = holeTexture.wrapT = THREE.RepeatWrapping;
+    holeTexture.repeat.set(10, 10);
+    holeMaterial = new THREE.MeshBasicMaterial({map: holeTexture, side: THREE.DoubleSide});
+
+    crackTexture = new THREE.ImageUtils.loadTexture('obj/floor/crack.jpg');
+    crackTexture.wrapS = crackTexture.wrapT = THREE.RepeatWrapping;
+    crackTexture.repeat.set(10, 10);
+    crackMaterial = new THREE.MeshBasicMaterial({map: crackTexture, side: THREE.DoubleSide});
+
     floorGeometry = new THREE.PlaneGeometry(20, 20, 10, 10);
 }
 /**
@@ -243,19 +251,39 @@ function setFloorTexture(i, j, k) {
     //
 }
 function setMapObject(i, j, k) {
-    console.log(mapInferior);
-    switch (numberToType[k]) {
-        case 'block':
-//            cannot be instanciated if water is below
-            if (numberToType[mapInferior[i][j]] === 'block') {
+    //            cannot be instanciated if water is below
+    var x = i * mapScale, y, z = j * mapScale;
+    if (numberToType[mapInferior[i][j]] === 'block') {
+        switch (numberToType[k]) {
+            case 'block':
                 var b = new Block();
-                b.init(i * mapScale, 0, j * mapScale);
+                b.init(x, 0, z);
                 mapObjects[i][j] = b;
-            }
-            break;
-        default:
-            break;
+                break;
+            case 'player':
+                player.init(x, 5, z);
+                break;
+            case 'hole':
+                floor[i][j] = new THREE.Mesh(floorGeometry, holeMaterial);
+                floor[i][j].position.x = x;
+                floor[i][j].position.z = z;
+                floor[i][j].position.y = -0.5;
+                floor[i][j].rotation.x = Math.PI / 2;
+                scene.add(floor[i][j]);
+                break;
+            case 'crack':
+                floor[i][j] = new THREE.Mesh(floorGeometry, crackMaterial);
+                floor[i][j].position.x = x;
+                floor[i][j].position.z = z;
+                floor[i][j].position.y = -0.5;
+                floor[i][j].rotation.x = Math.PI / 2;
+                scene.add(floor[i][j]);
+                break;
+            default:
+                break;
+        }
     }
+
 }
 /*----------------------MAP LOADING END-------------------------------------*/
 
