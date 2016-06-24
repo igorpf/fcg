@@ -65,12 +65,13 @@ var Monster = function() {
 			}
 		});
 
-
+                var scale=5;
 		object.position.x = that.getPosx();
 		object.position.y = that.getPosy();
-		object.scale.x = 15;
-		object.scale.y = 15;
-		object.scale.z = 15;
+		object.position.z = that.getPosz();
+		object.scale.x = scale;
+		object.scale.y = scale;
+		object.scale.z = scale;
 		object.rotation.x = 0;
 
 		that.monster_object = object;

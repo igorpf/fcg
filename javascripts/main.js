@@ -1,14 +1,13 @@
 //globais
 var activeCamera = 1;
 var clock = new THREE.Clock();
-var perspCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 500);//(viewangle, aspect, near, far)
-var chaseCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 500);//(viewangle, aspect, near, far)
-var ortoCamera = new THREE.OrthographicCamera(0, 400, 400, 0, -20, 500);
+var fpCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 500);//(viewangle, aspect, near, far)
+var chaseCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 1200);//(viewangle, aspect, near, far)
+var ortoCamera = new THREE.OrthographicCamera(10, 800 / 2, 0, 780 / -2, 1, 300);
 var keyboard = new THREEx.KeyboardState();
 var axis = new THREE.AxisHelper(10);
 var scene, renderer;
 var player, controls;
-var monster1;
 var floor; //geometry/texture 
 var floorGeometry;
 var grassMaterial, grassTexture, waterMaterial, waterTexture;
@@ -22,6 +21,8 @@ var mapScale = 20;
 var inputElement = document.getElementById("input1");
 var inputElement2 = document.getElementById("input2");
 var size = 20;
+var src;
+var enemies = new Array(4), enemiesCounter = 0;
 /*initalization (THIS MUST BE MADE GLOBALLY)*/
 mapInferior = new Array(size);
 mapSuperior = new Array(size);
@@ -35,7 +36,7 @@ for (var i = 0; i < size; ++i) {
 }
 //quando escolher o arquivo, já carrega o mapa do jogo
 
-var src;
+
 
 var container = $('#scene-container');
 
@@ -48,11 +49,12 @@ function mainLoop() {
 
 function init() {
     var windowHalfX = container.width() / 2;
-    perspCamera.position.x = 40;
-    perspCamera.position.y = 40;
-    perspCamera.position.z = 150;
+    fpCamera.position.x = 0;
+    fpCamera.position.y = 15;
+    fpCamera.position.z = -10;
+    fpCamera.lookAt(new THREE.Vector3(200, 15, -200));
     ortoCamera.position.x = 0;
-    ortoCamera.position.y = 400;
+    ortoCamera.position.y = 100;
     ortoCamera.position.z = 0;
     //TODO: fazer a camera se mexer conforme o boneco mexe
     chaseCamera.position.x = 0;
@@ -75,18 +77,17 @@ function init() {
     var directionalLight = new THREE.DirectionalLight(0xffeedd);
     directionalLight.position.set(0, 0, 1).normalize();
     scene.add(directionalLight);
-
     player = new Player();
 
+    
+    
 
-	this.monster1 = new Monster();
-	monster1.init(0,0,-40);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x000000);
     renderer.setSize(800, 600);
     renderer.setPixelRatio(window.devicePixelRatio);
-    controls = new THREE.OrbitControls(perspCamera, renderer.domElement);
+//    controls = new THREE.OrbitControls(fpCamera, renderer.domElement);
     container.append(renderer.domElement);
 
 }
@@ -105,39 +106,46 @@ function animate() {
 
 function update()
 {
-    var delta = clock.getDelta(); // seconds.
-    var moveDistance = 50 * delta; // 50 pixels per second
-    var rotateAngle = Math.PI / 0.7 * delta;   // pi/2 radians (90 degrees) per second
+    var delta = clock.getDelta();
+    var moveDistance = 50 * delta;
 
     if (player.player_object !== undefined) {
 
         if (keyboard.pressed("W")) {
-		player.checkRotation('up');
-		player.player_object.translateZ( - moveDistance );
-        }
-        if (keyboard.pressed("S")) {
-		player.checkRotation('down');
-		player.player_object.translateZ(  - moveDistance );
-        }
-        if (keyboard.pressed("A")) {
-		player.checkRotation('left');
-		player.player_object.translateZ( -moveDistance );
-        }
-        if (keyboard.pressed("D")) {
-		player.checkRotation('right');
-		
-		player.player_object.translateZ(  - moveDistance );	
-        }
+            player.checkRotation('up');
+            player.player_object.translateZ(-moveDistance);
+            fpCamera.rotation.y = - player.player_object.rotation.y;
+            fpCamera.position.z = player.player_object.position.z - 10;
+            fpCamera.position.x = player.player_object.position.x;
+            
+        } else if (keyboard.pressed("S")) {
+            player.checkRotation('down');
+            player.player_object.translateZ(-moveDistance);
+            fpCamera.rotation.y = - player.player_object.rotation.y;
+            fpCamera.position.z = player.player_object.position.z + 10;
+            fpCamera.position.x = player.player_object.position.x;
+        } else if (keyboard.pressed("A")) {
+            player.checkRotation('left');
+            player.player_object.translateZ(-moveDistance);
+            fpCamera.rotation.y = player.player_object.rotation.y;
+            fpCamera.position.x = player.player_object.position.x - 10;
 
-        var relativeCameraOffset = new THREE.Vector3(0, 300, 600);
-
-        var cameraOffset = relativeCameraOffset.applyMatrix4(player.player_object.matrixWorld);
+        } else if (keyboard.pressed("D")) {
+            player.checkRotation('right');
+            player.player_object.translateZ(-moveDistance);
+            fpCamera.rotation.y = player.player_object.rotation.y;
+            fpCamera.position.x = player.player_object.position.x + 10;
+        }
+        var relativeCameraOffset = new THREE.Vector3(150, 150, 150);
+        var cameraOffset = relativeCameraOffset.add(player.player_object.position);
         chaseCamera.position.x = cameraOffset.x;
         chaseCamera.position.y = cameraOffset.y;
         chaseCamera.position.z = cameraOffset.z;
         chaseCamera.lookAt(player.player_object.position);
+        //fpCamera.rotation.y = - player.player_object.rotation.y;
+        //fpCamera.position.x = player.player_object.position.x;
+        
     }
-
     if (keyboard.pressed("1")) {
         activeCamera = 1;
     }
@@ -147,15 +155,14 @@ function update()
     if (keyboard.pressed("3")) {
         activeCamera = 3;
     }
-
-    controls.update();
+//    controls.update();
     stats.update();
 }
 
 function render() {
     switch (activeCamera) {
         case 1:
-            renderer.render(scene, perspCamera);
+            renderer.render(scene, fpCamera);
             break;
         case 2:
             renderer.render(scene, ortoCamera);
@@ -189,6 +196,7 @@ function processimage(e) {
     var buffer = e.target.result;
     var bitmap = getBMP(buffer);
     var size = 20;
+    enemiesCounter = 0;
     initializeDictionaries();
     loadFloor();
     for (var i = 0; i < size; ++i)
@@ -240,7 +248,7 @@ function loadFloor() {
     crackTexture.repeat.set(10, 10);
     crackMaterial = new THREE.MeshBasicMaterial({map: crackTexture, side: THREE.DoubleSide});
 
-    floorGeometry = new THREE.PlaneGeometry(20, 20, 10, 10);
+    floorGeometry = new THREE.PlaneGeometry(20, 20, 1, 1);
 }
 /**
  * 
@@ -252,8 +260,8 @@ function loadFloor() {
 function setFloorTexture(i, j, k) {
     //FLOOR
     floor[i][j] = new THREE.Mesh(floorGeometry, (numberToType[k] === 'empty') ? waterMaterial : grassMaterial);
-    floor[i][j].position.x = i * mapScale;
-    floor[i][j].position.z = j * mapScale;
+    floor[i][j].position.x = i * mapScale + mapScale / 2;
+    floor[i][j].position.z = j * mapScale + mapScale / 2;
     floor[i][j].position.y = -0.5;
     floor[i][j].rotation.x = Math.PI / 2;
     scene.add(floor[i][j]);
@@ -261,7 +269,7 @@ function setFloorTexture(i, j, k) {
 }
 function setMapObject(i, j, k) {
     //            cannot be instanciated if water is below
-    var x = i * mapScale, y, z = j * mapScale;
+    var x = i * mapScale + mapScale / 2, y, z = j * mapScale + mapScale / 2;
     if (numberToType[mapInferior[i][j]] === 'block') {
         switch (numberToType[k]) {
             case 'block':
@@ -270,7 +278,9 @@ function setMapObject(i, j, k) {
                 mapObjects[i][j] = b;
                 break;
             case 'player':
-                player.init(x, 5, z);
+                player.init(x, 10, z);
+                fpCamera.position.x=x;
+                fpCamera.position.z=z;
                 break;
             case 'hole':
                 floor[i][j] = new THREE.Mesh(floorGeometry, holeMaterial);
@@ -287,6 +297,10 @@ function setMapObject(i, j, k) {
                 floor[i][j].position.y = -0.5;
                 floor[i][j].rotation.x = Math.PI / 2;
                 scene.add(floor[i][j]);
+                break;
+            case 'enemy':
+                enemies[enemiesCounter] = new Monster();
+                enemies[enemiesCounter++].init(x, 4, z)
                 break;
             default:
                 break;

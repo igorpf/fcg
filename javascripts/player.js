@@ -66,16 +66,18 @@ var Player = function() {
 			}
 		});
 
-
+                var scale = 0.1;
 		object.position.x = that.getPosx();
 		object.position.y = that.getPosy();
-		object.scale.x = 0.2;
-		object.scale.y = 0.2;
-		object.scale.z = 0.2;
+		object.position.z = that.getPosz();
+		object.scale.x = scale;
+		object.scale.y = scale;
+		object.scale.z = scale;
 
 		that.player_object = object;
 
 		scene.add(that.player_object);
+                activeCamera = 3;
 	};
 
 	
