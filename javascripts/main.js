@@ -79,8 +79,8 @@ function init() {
     scene.add(directionalLight);
     player = new Player();
 
-    
-    
+
+
 
 
     renderer = new THREE.WebGLRenderer();
@@ -110,50 +110,47 @@ function update()
     var moveDistance = 50 * delta;
 
     if (player.player_object !== undefined) {
-        
+        var currentPos = worldToMapCoordinates(player.player_object.position);
+        var v = new THREE.Vector3(0, 0, 0);
         if (keyboard.pressed("W")) {
             player.checkRotation('up');
-            var v = new THREE.Vector3(0,0,-moveDistance);
-            v.add(player.player_object.position);
-            var p = worldToMapCoordinates(v);
-            var t = numberToType[mapSuperior[p.x][p.z]];
-            if(t!=='block')
-                player.player_object.translateZ(-moveDistance);
-            
+            v = v.set(0, 0, -moveDistance);
+            v = v.add(player.player_object.position);
         } else if (keyboard.pressed("S")) {
             player.checkRotation('down');
-            var v = new THREE.Vector3(0,0,moveDistance);
-            v.add(player.player_object.position);
-            var p = worldToMapCoordinates(v);
-            var t = numberToType[mapSuperior[p.x][p.z]];
-            if(t!=='block'&&v.z<=mapSuperior.length*mapScale)
-                player.player_object.translateZ(-moveDistance);
+            v = v.set(0, 0, moveDistance);
+            v = v.add(player.player_object.position);
         } else if (keyboard.pressed("A")) {
             player.checkRotation('left');
-            var v = new THREE.Vector3(-moveDistance,0,0);
-            v.add(player.player_object.position);
-            var p = worldToMapCoordinates(v);
-            var t = numberToType[mapSuperior[p.x][p.z]];
-            if(t!=='block')
-                player.player_object.translateZ(-moveDistance);
+            v = v.set(-moveDistance, 0, 0);
+            v = v.add(player.player_object.position);
+
         } else if (keyboard.pressed("D")) {
             player.checkRotation('right');
-            var v = new THREE.Vector3(moveDistance,0,0);
-            v.add(player.player_object.position);
-            var p = worldToMapCoordinates(v);
-            var t = numberToType[mapSuperior[p.x][p.z]];
-            if(t!=='block'&&v.x<=mapSuperior.length*mapScale)
-                player.player_object.translateZ(-moveDistance);
+            v = v.set(moveDistance, 0, 0);
+            v = v.add(player.player_object.position);
+
         }
-        
-            
+        //Avoids the moviment when a keyboard hasn't been pressed
+        if ((keyboard.pressed("W") || keyboard.pressed("A") || keyboard.pressed("S") || keyboard.pressed("D"))) {
+            var p = worldToMapCoordinates(v);
+            if (p.x>=0&&p.x<mapSuperior.length && p.z>=0&&p.z<mapSuperior.length){//move only inside the map bounds
+                var t = numberToType[mapSuperior[p.x][p.z]];
+                if (t !== 'block' && !v.equals(player.player_object.position)) {
+                    player.player_object.translateZ(-moveDistance);
+                    mapSuperior[currentPos.x][currentPos.z] = 0;
+                    mapSuperior[p.x][p.z] = 5;
+                }
+            }
+        }
+
         var relativeCameraOffset = new THREE.Vector3(150, 150, 150);
         var cameraOffset = relativeCameraOffset.add(player.player_object.position);
         chaseCamera.position.x = cameraOffset.x;
         chaseCamera.position.y = cameraOffset.y;
         chaseCamera.position.z = cameraOffset.z;
         chaseCamera.lookAt(player.player_object.position);
-        fpCamera.rotation.y = - player.player_object.rotation.y;
+        fpCamera.rotation.y = -player.player_object.rotation.y;
         fpCamera.position.x = player.player_object.position.x;
         fpCamera.position.z = player.player_object.position.z;
     }
@@ -290,8 +287,8 @@ function setMapObject(i, j, k) {
                 break;
             case 'player':
                 player.init(x, 10, z);
-                fpCamera.position.x=x;
-                fpCamera.position.z=z;
+                fpCamera.position.x = x;
+                fpCamera.position.z = z;
                 break;
             case 'hole':
                 floor[i][j] = new THREE.Mesh(floorGeometry, holeMaterial);
@@ -316,8 +313,7 @@ function setMapObject(i, j, k) {
             default:
                 break;
         }
-    }
-    else
+    } else
         mapSuperior[i][j] = 0;
 }
 /*----------------------MAP LOADING END-------------------------------------*/
