@@ -55,6 +55,7 @@ function worldToMapCoordinates(position){
     var point = {};
     point.x = Math.floor(position.x/mapScale);
     point.z = Math.floor(position.z/mapScale);
+    return point;
 }
 function floodFill(x, y){
 	if(alreadyFilled(x, y)) return;

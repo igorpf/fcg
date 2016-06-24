@@ -110,21 +110,43 @@ function update()
     var moveDistance = 50 * delta;
 
     if (player.player_object !== undefined) {
+        
         if (keyboard.pressed("W")) {
             player.checkRotation('up');
-            player.player_object.translateZ(-moveDistance);
+            var v = new THREE.Vector3(0,0,-moveDistance);
+            v.add(player.player_object.position);
+            var p = worldToMapCoordinates(v);
+            var t = numberToType[mapSuperior[p.x][p.z]];
+            if(t!=='block')
+                player.player_object.translateZ(-moveDistance);
             
         } else if (keyboard.pressed("S")) {
             player.checkRotation('down');
-            player.player_object.translateZ(-moveDistance);
+            var v = new THREE.Vector3(0,0,moveDistance);
+            v.add(player.player_object.position);
+            var p = worldToMapCoordinates(v);
+            var t = numberToType[mapSuperior[p.x][p.z]];
+            if(t!=='block'&&v.z<=mapSuperior.length*mapScale)
+                player.player_object.translateZ(-moveDistance);
         } else if (keyboard.pressed("A")) {
             player.checkRotation('left');
-            player.player_object.translateZ(-moveDistance);
+            var v = new THREE.Vector3(-moveDistance,0,0);
+            v.add(player.player_object.position);
+            var p = worldToMapCoordinates(v);
+            var t = numberToType[mapSuperior[p.x][p.z]];
+            if(t!=='block')
+                player.player_object.translateZ(-moveDistance);
         } else if (keyboard.pressed("D")) {
             player.checkRotation('right');
-
-            player.player_object.translateZ(-moveDistance);
+            var v = new THREE.Vector3(moveDistance,0,0);
+            v.add(player.player_object.position);
+            var p = worldToMapCoordinates(v);
+            var t = numberToType[mapSuperior[p.x][p.z]];
+            if(t!=='block'&&v.x<=mapSuperior.length*mapScale)
+                player.player_object.translateZ(-moveDistance);
         }
+        
+            
         var relativeCameraOffset = new THREE.Vector3(150, 150, 150);
         var cameraOffset = relativeCameraOffset.add(player.player_object.position);
         chaseCamera.position.x = cameraOffset.x;
@@ -295,7 +317,8 @@ function setMapObject(i, j, k) {
                 break;
         }
     }
-
+    else
+        mapSuperior[i][j] = 0;
 }
 /*----------------------MAP LOADING END-------------------------------------*/
 
