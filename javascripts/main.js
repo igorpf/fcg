@@ -22,7 +22,6 @@ var inputElement = document.getElementById("input1");
 var inputElement2 = document.getElementById("input2");
 var size = 20;
 var src;
-var fpControls = new THREE.PointerLockControls(fpCamera);
 var enemies = new Array(4), enemiesCounter = 0;
 /*initalization (THIS MUST BE MADE GLOBALLY)*/
 mapInferior = new Array(size);
@@ -50,9 +49,10 @@ function mainLoop() {
 
 function init() {
     var windowHalfX = container.width() / 2;
-    fpCamera.position.x = 40;
-    fpCamera.position.y = 40;
+    fpCamera.position.x = 0;
+    fpCamera.position.y = 15;
     fpCamera.position.z = 0;
+    fpCamera.lookAt(new THREE.Vector3(200, 15, 200));
     ortoCamera.position.x = 0;
     ortoCamera.position.y = 200;
     ortoCamera.position.z = 0;
@@ -77,20 +77,17 @@ function init() {
     var directionalLight = new THREE.DirectionalLight(0xffeedd);
     directionalLight.position.set(0, 0, 1).normalize();
     scene.add(directionalLight);
-    fpControls.enabled = true;
-    scene.add(fpControls.getObject());
     player = new Player();
 
-//    this.player = new Player();
-//    player.init(0, 0, 0);
-
+    
+    
 
 
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x000000);
     renderer.setSize(800, 600);
     renderer.setPixelRatio(window.devicePixelRatio);
-    controls = new THREE.OrbitControls(fpCamera, renderer.domElement);
+//    controls = new THREE.OrbitControls(fpCamera, renderer.domElement);
     container.append(renderer.domElement);
 
 }
@@ -116,6 +113,7 @@ function update()
         if (keyboard.pressed("W")) {
             player.checkRotation('up');
             player.player_object.translateZ(-moveDistance);
+            
         } else if (keyboard.pressed("S")) {
             player.checkRotation('down');
             player.player_object.translateZ(-moveDistance);
@@ -133,8 +131,9 @@ function update()
         chaseCamera.position.y = cameraOffset.y;
         chaseCamera.position.z = cameraOffset.z;
         chaseCamera.lookAt(player.player_object.position);
-        fpControls.getObject().translateX(moveDistance * delta);
-        fpControls.getObject().translateZ(moveDistance * delta);
+        fpCamera.rotation.y = - player.player_object.rotation.y;
+        fpCamera.position.x = player.player_object.position.x;
+        fpCamera.position.z = player.player_object.position.z;
     }
     if (keyboard.pressed("1")) {
         activeCamera = 1;
@@ -145,7 +144,7 @@ function update()
     if (keyboard.pressed("3")) {
         activeCamera = 3;
     }
-    controls.update();
+//    controls.update();
     stats.update();
 }
 
@@ -259,7 +258,7 @@ function setFloorTexture(i, j, k) {
 }
 function setMapObject(i, j, k) {
     //            cannot be instanciated if water is below
-    var x = i * mapScale+mapScale/2, y, z = j * mapScale+mapScale/2;
+    var x = i * mapScale + mapScale / 2, y, z = j * mapScale + mapScale / 2;
     if (numberToType[mapInferior[i][j]] === 'block') {
         switch (numberToType[k]) {
             case 'block':
@@ -269,19 +268,21 @@ function setMapObject(i, j, k) {
                 break;
             case 'player':
                 player.init(x, 10, z);
+                fpCamera.position.x=x;
+                fpCamera.position.z=z;
                 break;
             case 'hole':
                 floor[i][j] = new THREE.Mesh(floorGeometry, holeMaterial);
-                floor[i][j].position.x = x ;
-                floor[i][j].position.z = z ;
+                floor[i][j].position.x = x;
+                floor[i][j].position.z = z;
                 floor[i][j].position.y = -0.5;
                 floor[i][j].rotation.x = Math.PI / 2;
                 scene.add(floor[i][j]);
                 break;
             case 'crack':
                 floor[i][j] = new THREE.Mesh(floorGeometry, crackMaterial);
-                floor[i][j].position.x = x ;
-                floor[i][j].position.z = z ;
+                floor[i][j].position.x = x;
+                floor[i][j].position.z = z;
                 floor[i][j].position.y = -0.5;
                 floor[i][j].rotation.x = Math.PI / 2;
                 scene.add(floor[i][j]);
