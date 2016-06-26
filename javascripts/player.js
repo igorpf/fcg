@@ -73,6 +73,8 @@ var Player = function() {
 		object.scale.x = scale;
 		object.scale.y = scale;
 		object.scale.z = scale;
+		object.castShadow = true;
+    	object.receiveShadow = false;
 
 		that.player_object = object;
 

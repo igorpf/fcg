@@ -25,7 +25,7 @@ var Block = function() {
 		var onError = function(xhr) {};
 
 		var texture_loader = new THREE.ImageLoader(manager);
-		texture_loader.load('obj/lego/face_haryach.jpg', function(image) {
+		texture_loader.load('obj/floor/crate.png', function(image) {
 			texture.image = image;
 			texture.needsUpdate = true;
 		});
