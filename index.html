@@ -1,48 +1,219 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>Trabalho final de FCG</title>
-		<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-        <script type="text/javascript" src="javascripts/three.js"></script>
-        <script type="text/javascript" src="javascripts/DDSLoader.js"></script>
-        <script type="text/javascript" src="javascripts/MTLLoader.js"></script> 
-		<script type="text/javascript" src="javascripts/OBJLoader.js"></script>  
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>FCG 01/2016</title>
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Material Design Lite">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script type="text/javascript" src="javascripts/three.js"></script>
+    <script type="text/javascript" src="javascripts/DDSLoader.js"></script>
+    <script type="text/javascript" src="javascripts/MTLLoader.js"></script> 
+    <script type="text/javascript" src="javascripts/OBJLoader.js"></script>  
 
 
-		<script type="text/javascript" src="javascripts/Detector.js"></script>
-		<script type="text/javascript" src="javascripts/Stats.js"></script>
-		<script type="text/javascript" src="javascripts/OrbitControls.js"></script>
+    <script type="text/javascript" src="javascripts/Detector.js"></script>
+    <script type="text/javascript" src="javascripts/Stats.js"></script>
+    <script type="text/javascript" src="javascripts/OrbitControls.js"></script>
 
-		<script type="text/javascript" src="javascripts/block.js"></script>
-		<script type="text/javascript" src="javascripts/player.js"></script>
-		<script type="text/javascript" src="javascripts/monsters.js"></script>
-		<script type="text/javascript" src="javascripts/THREEx.KeyboardState.js"></script>
+    <script type="text/javascript" src="javascripts/block.js"></script>
+    <script type="text/javascript" src="javascripts/player.js"></script>
+    <script type="text/javascript" src="javascripts/monsters.js"></script>
+    <script type="text/javascript" src="javascripts/THREEx.KeyboardState.js"></script>
 
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        <link rel="stylesheet" href="css/main.css">
-              
-	</head>
-	<body>
-		<div class="container-fluid">
-            <h1 class="col-lg-offset-4" id="status">Arquivo de bitmap</h1>
-            <p class="col-lg-offset-4" id="instruction"></p>
-            <div class="col-lg-offset-3 col-lg-3">Inferior
-                <input class="form-control" type="file" id="input1" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.deep_purple-pink.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+    #view-source {
+      position: fixed;
+      display: block;
+      right: 0;
+      bottom: 0;
+      margin-right: 40px;
+      margin-bottom: 40px;
+      z-index: 900;
+    }
+    </style>
+
+
+
+
+  </head>
+  <body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+      <header class="mdl-layout__header mdl-layout__header--scroll mdl-color-primary-override ">
+        <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+        </div>
+        <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+          <h3>FCG 01/2016</h3>
+        </div>
+        <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+          <h6>Filipe Joner e Igor Ferreira</h6>
+        </div>
+        <div class="mdl-layout__tab-bar mdl-js-ripple-effect mdl-color-primary-override2">
+          <a href="#overview" class="mdl-layout__tab is-active">Overview</a>
+          <a href="#gameplay" class="mdl-layout__tab">Gameplay</a>
+          <a href="#imagens" class="mdl-layout__tab">Imagens</a>
+          <a href="#manual" class="mdl-layout__tab">Manual</a>
+          <a href="#fontes" class="mdl-layout__tab">Fontes</a>
+        </div>
+      </header>
+      <main class="mdl-layout__content">
+        <div class="mdl-layout__tab-panel is-active" id="overview">
+          <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+            <div class="mdl-card mdl-cell mdl-cell--12-col">
+              <div class="mdl-card__supporting-text">
+                <h4>Desenvolvimento</h4>
+                O desenvolvimento do trabalho foi realizado utilizando <b>WebGl</b>. Ambos os integrantes do grupo desconheciam a biblioteca utilizada, o que dificultou a implementação. Além disso, a linguagem de programação utilizada, por ser interpretada, foi por vezes um empecilho para a compreensão de certos bugs que ocorreram ao longo do desenvolvimento. Algumas partes da lógica do jogo foram problemáticas de realizar, como a queda do chão ao finalizar uma rachadura ou o movimento coordenado dos adversários que apareciam no mapa. <br><br>
+                A ferramenta, porém, auxiliou bastante em algumas funcionalidades, que foram bem simples de serem implementadas, como a movimentação do personagem, a aplicação de texturas e carregamento de arquivos de extensão .obj na cena.  
+                <br><br>
+                Apesar de certas dificuldades, o desenvolvimento do trabalho foi propício aos alunos para que eles conhecessem novas ferramentas. A divisão de tarefas se deu de forma conjunta, o que acabou por não sobrecarregar nenhum dos integrantes do grupo. Ainda que o prazo para entrega do trabalho final da disciplina fosse relativamente extenso e a divisão de tarefas tenha sido bem distribuída, com ambos integrantes trabalhando, o projeto final da disciplina não pôde ficar pronto antes do prazo estipulado.
+
+              </div>
+              <div class="mdl-card__actions">
+               <br>
+              </div>
             </div>
-            <div class="col-lg-3">Superior
-                <input class="form-control" type="file" id="input2" />
+          </section>
+          <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+            <div class="mdl-card mdl-cell mdl-cell--12-col">
+              <div class="mdl-card__supporting-text">
+                <h4>Tecnologias</h4>
+                Para o desenvolvimento do trabalho foram empregadas as seguintes tecnologias:
+                <ul>
+                  <li><b> Javascript</b></li>
+                  <li> Biblioteca <b>WebGL</b></li>
+                  <li> Biblioteca Three.js </li>
+                  <li> GitHub para versionamento </li>
+                </ul>
+
+              </div>
+              <div class="mdl-card__actions">
+                <br>
+              </div>
             </div>
-            <br><br><br><br>
-			<div class="col-lg-offset-3 col-lg-8">
-				<div id="scene-container"></div>
-				<div id="mapCanvas" style="position: absolute; left:100px; top:100px; width:320px; height:240px;"></div>
-			</div>
-		</div>
-		<script type="text/javascript" src="javascripts/main.js"></script>
-		<script type="text/javascript" src="javascripts/THREEx.KeyboardState.js"></script>
-		<script type="text/javascript" src="javascripts/utils.js"></script>
-        <script type="text/javascript" src="javascripts/bitmapLoader.js"></script>
-        
-	</body>
+          </section>
+        </div>
+        <div class="mdl-layout__tab-panel is-active" id="gameplay">
+          <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+            <div class="mdl-card mdl-cell mdl-cell--12-col">
+              <div class="mdl-card__supporting-text">
+                <div class="container-fluid">
+                  <h3 id="status">Arquivo de bitmap</h3>
+                  <p  id="instruction"></p>
+                  <div>
+                      Nível inferior:
+                      <input class="form-control" type="file" id="input1" />
+                      Nível Superior:
+                      <input class="form-control" type="file" id="input2" />
+                  </div>
+                  <br><br><br><br>
+                  <div>
+                    <div id="scene-container"></div>
+                    <div id="mapCanvas" style="position: absolute; left:60px; top:230px; width:320px; height:240px;"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="mdl-card__actions">
+               <br>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="mdl-layout__tab-panel" id="manual">
+          <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+            <div class="mdl-card mdl-cell mdl-cell--12-col">
+              <div class="mdl-card__supporting-text">
+                <div class="container-fluid">
+                  <h3>Objetivos</h3>
+                    O jogador deve eliminar todos os inimigos do cenário com o auxílio de uma britadeira, usada para rachar terrenos da ilha para desmoronamento de uma parte da ilha. Caso o jogador se encontre na parte a ser desmoronada,  seja enconstado pelos inimigos ou caia na água, esse perderá o jogo. O jogador pode, além de fazer terrenos desmoronarem, empurrar os inimigos na água, para eliminá-los, sempre cuidando para que esses não estejam próximos demais para não ser enconstado.
+
+                </div>
+              </div>
+              <div class="mdl-card__actions">
+               <br>
+              </div>
+
+            </div>
+            </section>
+            <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">  
+            <div class="mdl-card mdl-cell mdl-cell--12-col">
+              <div class="mdl-card__supporting-text">
+                <div class="container-fluid">
+                  <h3>Como jogar</h3>
+                   <ul>
+                     <li> Tecla <b>W</b>: anda para frente</li>
+                     <li> Tecla <b>S</b>: anda para trás</li>
+                     <li> Tecla <b>A</b>: anda para direita</li>
+                     <li> Tecla <b>D</b>: anda para esquerda</li>
+                     <li> Tecla <b>F</b>: empurra o inimigo</li>
+                     <li> Tecla <b>Barra de Espaço</b>: cria rachadura</li>
+                     <li> Tecla <b>V</b>: troca a câmera</li>
+                   </ul>
+                
+                </div>
+              </div>
+              <div class="mdl-card__actions">
+               <br>
+              </div>
+            </div>
+          </section>
+          <br><br>
+        </div>
+        <div class="mdl-layout__tab-panel" id="fontes">
+          <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+            <div class="mdl-card mdl-cell mdl-cell--12-col">
+              <div class="mdl-card__supporting-text">
+                <div class="container-fluid">
+                  <h3>Código Fonte</h3>
+                  <p> Para baixar o código fonte <a href="https://github.com/igorpf/fcg.git" target="_blank">clique aqui</a></p>
+                </div>
+              </div>
+              <div class="mdl-card__actions">
+               <br>
+              </div>
+            </div>
+          </section>
+          <br><br><br><br><br><br>
+        </div>
+        <footer class="mdl-mega-footer">
+          <div class="mdl-mega-footer--middle-section">
+            <div class="mdl-mega-footer--drop-down-section">
+              <input class="mdl-mega-footer--heading-checkbox" type="checkbox" checked>
+              <h1 class="mdl-mega-footer--heading">Alunos:</h1>
+              <ul class="mdl-mega-footer--link-list">
+                <li>Filipe Joner</li>
+                <li>Igor Pires Ferreira</li>
+              </ul>
+            </div>
+          </div>
+          <div class="mdl-mega-footer--bottom-section">
+            <div class="mdl-logo">
+              Disciplina de Fundamentos de Computação Gráfica
+            </div>
+            <ul class="mdl-mega-footer--link-list">
+              <li>Professor Marcelo Walter</li>
+            </ul>
+          </div>
+        </footer>
+      </main>
+    </div>
+      <script type="text/javascript" src="javascripts/main.js"></script>
+      <script type="text/javascript" src="javascripts/THREEx.KeyboardState.js"></script>
+      <script type="text/javascript" src="javascripts/utils.js"></script>
+      <script type="text/javascript" src="javascripts/bitmapLoader.js"></script>
+      <script src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+  </body>
 </html>
