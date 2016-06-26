@@ -182,7 +182,7 @@ function update() {
                     mapSuperior[p.x][p.z] = 5;
                 }                
                 else if (tInf === 'empty'){                    
-                    player.player_object.translateY(-9);
+                    player.player_object.translateY(-12);
                     var timer = setInterval(function (){
                         $('#status').html("Tu faleceste!");
                         $('#instruction').html("Atualize a p&aacute;gina para tentar novamente");
@@ -232,6 +232,7 @@ function update() {
         if (keyboard.pressed("F")) {
             var direction = player.getLookingAt();
             for (i = 0; i < enemies.length; i++) {
+                var moved = false;
                 if (player_bbox.position.x >= collidableMeshList[i].position.x) {
                     if (player_bbox.position.x - collidableMeshList[i].position.x > 6 &&
                         player_bbox.position.x - collidableMeshList[i].position.x <= 15) {
@@ -251,7 +252,7 @@ function update() {
                                     enemies[i].monster_object.translateX(20);
 
                                 }
-
+                                moved = true;
                             }
                         } else {
                             if (collidableMeshList[i].position.z - player_bbox.position.z > 6 &&
@@ -268,7 +269,7 @@ function update() {
                                     enemies[i].monster_object.translateX(20);
 
                                 }
-
+                                moved = true;
                             }
 
                         }
@@ -291,6 +292,7 @@ function update() {
                                     enemies[i].monster_object.translateX(20);
 
                                 }
+                                moved = true;
                             }
                         } else {
                             if (player_bbox.position.z - collidableMeshList[i].position.z > 6 &&
@@ -307,13 +309,19 @@ function update() {
                                     enemies[i].monster_object.translateX(20);
 
                                 }
-
+                                moved = true;
                             }
                         }
 
                     }
                 }
-
+                
+                var mPos = worldToMapCoordinates(enemies[i].monster_object.position);
+                if(moved && numberToType[mapInferior[mPos.x][mPos.z]] === 'empty'){
+                    enemies[i].monster_object.translateY(-12);                     
+                    var m = enemies.splice(i, 1);
+                    scene.remove(m[0].monster_object);                                        
+                }
             }
         }
 
@@ -614,7 +622,7 @@ function setFloorTexture(i, j, k) {
 }
 
 function setMapObject(i, j, k) {
-    //            cannot be instanciated if water is below
+    //            cannot be instantiated if water is below
     var x = i * mapScale + mapScale / 2,
         y, z = j * mapScale + mapScale / 2;
     if (numberToType[mapInferior[i][j]] === 'block') {
