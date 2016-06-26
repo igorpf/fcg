@@ -1,5 +1,5 @@
 //globais
-var activeCamera = 1;
+var activeCamera = 0;
 var clock = new THREE.Clock();
 var fpCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 500); //(viewangle, aspect, near, far)
 var chaseCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 1200); //(viewangle, aspect, near, far)
@@ -161,13 +161,7 @@ function update() {
         }
 
         if (keyboard.pressed("V")) {
-            if (activeCamera == 1) {
-                activeCamera = 2;
-            } else if (activeCamera == 2) {
-                activeCamera = 3;
-            } else if (activeCamera == 3) {
-                activeCamera = 1;
-            }
+            activeCamera=(activeCamera+1)%3;
         }
 
         //Avoids the moviment when a keyboard hasn't been pressed
@@ -183,7 +177,7 @@ function update() {
                 }                
                 else if (tInf === 'empty'){                    
                     player.player_object.translateY(-12);
-                    var timer = setInterval(function (){
+                    var timer = setTimeout(function (){
                         $('#status').html("Tu faleceste!");
                         $('#instruction').html("Atualize a p&aacute;gina para tentar novamente");
                         cancelAnimationFrame(id);
@@ -375,15 +369,8 @@ function update() {
 
 
 
-    if (keyboard.pressed("1")) {
-        activeCamera = 1;
-    }
-    if (keyboard.pressed("2")) {
-        activeCamera = 2;
-    }
-    if (keyboard.pressed("3")) {
-        activeCamera = 3;
-    }
+
+    
 
 
 
@@ -399,14 +386,14 @@ function render() {
 
 
     switch (activeCamera) {
-        case 1:
+        case 0:
             renderer.setViewport(0, 0, w, h);
             renderer.clear();
             renderer.render(scene, fpCamera);
             renderer.setViewport(10, h - mapHeight - 10, mapWidth, mapHeight);
             renderer.render(scene, ortoCamera);
             break;
-        case 2:
+        case 1:
             renderer.setViewport(0, 0, w, h);
             renderer.clear();
             renderer.render(scene, ortoCamera);
@@ -414,7 +401,7 @@ function render() {
             renderer.render(scene, ortoCamera);
 
             break;
-        case 3:
+        case 2:
             renderer.setViewport(0, 0, w, h);
             renderer.clear();
             renderer.render(scene, chaseCamera);
