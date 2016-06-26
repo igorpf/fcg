@@ -8,7 +8,8 @@ var mini_ortoCamera = new THREE.OrthographicCamera(10, 800 / 2, 0, 780 / -2, 1, 
 var keyboard = new THREEx.KeyboardState();
 var axis = new THREE.AxisHelper(10);
 var scene, renderer;
-var player, controls;
+var player = new Player();
+var controls;
 var floor; //geometry/texture 
 var floorGeometry;
 var grassMaterial, grassTexture, waterMaterial, waterTexture;
@@ -27,8 +28,7 @@ var enemies = [],
     enemiesCounter = 0;
 
 var id;
-
-
+var listener = new THREE.AudioListener();
 
 /*initalization (THIS MUST BE MADE GLOBALLY)*/
 mapInferior = new Array(size);
@@ -65,7 +65,6 @@ function init() {
     ortoCamera.position.x = 0;
     ortoCamera.position.y = 100;
     ortoCamera.position.z = 0;
-    //TODO: fazer a camera se mexer conforme o boneco mexe
     chaseCamera.position.x = 0;
     chaseCamera.position.y = 0;
     chaseCamera.position.z = 40;
@@ -77,7 +76,11 @@ function init() {
     stats = new Stats();
     container.append(stats.dom);
 
+    chaseCamera.add(listener);
+    ortoCamera.add(listener);
+    fpCamera.add(listener);
 
+    var audioLoader = new THREE.AudioLoader();
     // scene
     scene = new THREE.Scene();
 
@@ -88,7 +91,6 @@ function init() {
     var directionalLight = new THREE.DirectionalLight(0xffeedd);
     directionalLight.position.set(0, 0, 1).normalize();
     scene.add(directionalLight);
-    player = new Player();
 
     var spotlight = new THREE.SpotLight(0xffffff);
     spotlight.position.set(-60, 150, -30);
@@ -98,6 +100,15 @@ function init() {
     // must enable shadow casting ability for the light
     spotlight.castShadow = true;
     scene.add(spotlight);
+
+    var sound = new THREE.Audio(listener);
+    audioLoader.load('sounds/bad_cat_master.ogg', function(buffer) {
+        sound.setBuffer(buffer);
+        sound.setLoop(true);
+        sound.setVolume(0.1);
+        sound.play();
+    });
+
 
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x000000);
@@ -127,6 +138,29 @@ function update() {
     var delta = clock.getDelta();
     var moveDistance = 50 * delta;
     var enemy_moveDistance = 25 * delta;
+
+
+    var wireMaterial = new THREE.MeshBasicMaterial({
+        color: 0xff0000,
+        wireframe: true
+    });
+    var collidableMeshList = [];
+    for (i = 0; i < enemies.length; i++) {
+        var enemy_geo_bbox = new THREE.CubeGeometry(10, 20, 10, 1, 1, 1);
+        enemy_bbox = new THREE.Mesh(player_geo_bbox, wireMaterial);
+        // enemy_bbox.position = enemies[i].monster_object.position.clone();
+        enemy_bbox.position.x = enemies[i].monster_object.position.x;
+        enemy_bbox.position.y = 4;
+        enemy_bbox.position.z = enemies[i].monster_object.position.z;
+        collidableMeshList.push(enemy_bbox);
+    };
+    var player_geo_bbox = new THREE.CubeGeometry(20, 30, 20, 1, 1, 1);
+    player_bbox = new THREE.Mesh(player_geo_bbox, wireMaterial);
+    player_bbox.position = player.player_object.position.clone();
+    player_bbox.position.x = player.player_object.position.x;
+    player_bbox.position.y = 4;
+    player_bbox.position.z = player.player_object.position.z;
+    var audioLoader = new THREE.AudioLoader();
 
     if (player.player_object !== undefined) {
         var currentPos = worldToMapCoordinates(player.player_object.position);
@@ -158,68 +192,7 @@ function update() {
             v = v.add(player.player_object.position);
             fpCamera.rotation.y = player.player_object.rotation.y;
             fpCamera.position.x = player.player_object.position.x + 10;
-        }
-
-        if (keyboard.pressed("V")) {
-            if (activeCamera == 1) {
-                activeCamera = 2;
-            } else if (activeCamera == 2) {
-                activeCamera = 3;
-            } else if (activeCamera == 3) {
-                activeCamera = 1;
-            }
-        }
-
-        //Avoids the moviment when a keyboard hasn't been pressed
-        if ((keyboard.pressed("W") || keyboard.pressed("A") || keyboard.pressed("S") || keyboard.pressed("D"))) {
-            var p = worldToMapCoordinates(v);
-            if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
-                var t = numberToType[mapSuperior[p.x][p.z]];
-                if (t !== 'block' && !v.equals(player.player_object.position)) {
-                    player.player_object.translateZ(-moveDistance);
-                    mapSuperior[currentPos.x][currentPos.z] = 0;
-                    mapSuperior[p.x][p.z] = 5;
-                }
-            }
-        }
-        var wireMaterial = new THREE.MeshBasicMaterial({
-            color: 0xff0000,
-            wireframe: true
-        });
-        var collidableMeshList = [];
-        for (i = 0; i < enemies.length; i++) {
-            var enemy_geo_bbox = new THREE.CubeGeometry(10, 20, 10, 1, 1, 1);
-            enemy_bbox = new THREE.Mesh(player_geo_bbox, wireMaterial);
-            // enemy_bbox.position = enemies[i].monster_object.position.clone();
-            enemy_bbox.position.x = enemies[i].monster_object.position.x;
-            enemy_bbox.position.y = 4;
-            enemy_bbox.position.z = enemies[i].monster_object.position.z;
-            collidableMeshList.push(enemy_bbox);
-        };
-        var player_geo_bbox = new THREE.CubeGeometry(20, 30, 20, 1, 1, 1);
-        player_bbox = new THREE.Mesh(player_geo_bbox, wireMaterial);
-        player_bbox.position = player.player_object.position.clone();
-        player_bbox.position.x = player.player_object.position.x;
-        player_bbox.position.y = 4;
-        player_bbox.position.z = player.player_object.position.z;
-        var originPoint = player_bbox.position.clone();
-
-
-        // for (var vertexIndex = 0; vertexIndex < player_bbox.geometry.vertices.length; vertexIndex++) {
-        //     var localVertex = player_bbox.geometry.vertices[vertexIndex].clone();
-        //     var globalVertex = localVertex.applyMatrix4(player_bbox.matrix);
-        //     var directionVector = globalVertex.sub(player_bbox.position);
-
-        //     var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
-        //     var collisionResults = ray.intersectObjects(collidableMeshList);
-        //     if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()){
-        //         cancelAnimationFrame(id);
-
-        //     }
-        // }
-
-
-        if (keyboard.pressed("F")) {
+        } else if (keyboard.pressed("F")) {
             var direction = player.getLookingAt();
             for (i = 0; i < enemies.length; i++) {
                 if (player_bbox.position.x >= collidableMeshList[i].position.x) {
@@ -267,7 +240,7 @@ function update() {
                     if (collidableMeshList[i].position.x - player_bbox.position.x > 6 &&
                         collidableMeshList[i].position.x - player_bbox.position.x <= 20) {
                         if (collidableMeshList[i].position.z > player_bbox.position.z) {
-                            if (collidableMeshList[i].position.z - player_bbox.position.z > 6&&
+                            if (collidableMeshList[i].position.z - player_bbox.position.z > 6 &&
                                 collidableMeshList[i].position.z - player_bbox.position.z <= 20) {
                                 if (direction == "up") {
                                     enemies[i].monster_object.translateZ(-20);
@@ -305,7 +278,29 @@ function update() {
                 }
 
             }
+
+            var sound_punch = new THREE.PositionalAudio(listener);
+            audioLoader.load('sounds/nutfall.flac', function(buffer) {
+                sound_punch.setBuffer(buffer);
+                sound_punch.setRefDistance(20);
+                sound_punch.play();
+            });
+            player_bbox.add(sound_punch);
         }
+
+        //Avoids the moviment when a keyboard hasn't been pressed
+        if ((keyboard.pressed("W") || keyboard.pressed("A") || keyboard.pressed("S") || keyboard.pressed("D"))) {
+            var p = worldToMapCoordinates(v);
+            if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
+                var t = numberToType[mapSuperior[p.x][p.z]];
+                if (t !== 'block' && !v.equals(player.player_object.position)) {
+                    player.player_object.translateZ(-moveDistance);
+                    mapSuperior[currentPos.x][currentPos.z] = 0;
+                    mapSuperior[p.x][p.z] = 5;
+                }
+            }
+        }
+
 
         for (i = 0; i < enemies.length; i++) {
             if (player_bbox.position.x >= collidableMeshList[i].position.x) {
@@ -410,16 +405,17 @@ function render() {
 
 function animate() {
     id = requestAnimationFrame(animate);
-    moveMonster();
+    //moveMonster();
     render();
     update();
 }
 
+var movements = setInterval(moveMonster, 100);
 /* --------------------- DUMMY MOVE ------------------------------------------*/
 // movements for dummy monsters 
 function moveMonster() {
     var delta = clock.getDelta();
-    var enemy_moveDistance = 1.0;
+    var enemy_moveDistance = 2.5;
     var options = ['up', 'down', 'left', 'right', ''];
     var v_enemy = [];
     var monsters_pos = [];
@@ -439,7 +435,7 @@ function moveMonster() {
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
                 var t = numberToType[mapSuperior[p.x][p.z]];
                 if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position)) {
-                    enemies[i].monster_object.translateZ(-(enemy_moveDistance + 1.25));
+                    enemies[i].monster_object.translateZ(-(enemy_moveDistance));
                     mapSuperior[currentPos.x][currentPos.z] = 0;
                     mapSuperior[p.x][p.z] = 5;
                 }
@@ -494,8 +490,8 @@ function moveMonster() {
                 }
             }
         }
-
     }
+
 }
 
 /*----------------------MAP LOADING BEGIN-------------------------------------*/
@@ -512,6 +508,8 @@ function handleFiles(e) {
     reader.addEventListener("load",
         processimage, false);
     reader.readAsArrayBuffer(file);
+
+
 }
 
 function processimage(e) {
@@ -551,7 +549,7 @@ function initializeDictionaries() {
 }
 
 function loadFloor() {
-    grassTexture = new THREE.ImageUtils.loadTexture('obj/floor/grass.jpg');
+    grassTexture = new THREE.ImageUtils.loadTexture('obj/floor/dark_grass.jpg');
     grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
     grassTexture.repeat.set(10, 10);
     grassMaterial = new THREE.MeshBasicMaterial({

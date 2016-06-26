@@ -39,7 +39,7 @@ var Monster = function() {
 		var onError = function(xhr) {};
 
 		var texture_loader = new THREE.ImageLoader(manager);
-		texture_loader.load('obj/lego/face_haryach.jpg', function(image) {
+		texture_loader.load('obj/wood/texture_wood.jpg', function(image) {
 
 			texture.image = image;
 			texture.needsUpdate = true;
@@ -65,7 +65,7 @@ var Monster = function() {
 			}
 		});
 
-                var scale=5;
+        var scale=6;
 		object.position.x = that.getPosx();
 		object.position.y = that.getPosy();
 		object.position.z = that.getPosz();

@@ -68,7 +68,7 @@ var Player = function() {
 			}
 		});
 
-                var scale = 0.1;
+        var scale = 0.1;
 		object.position.x = that.getPosx();
 		object.position.y = that.getPosy();
 		object.position.z = that.getPosz();
