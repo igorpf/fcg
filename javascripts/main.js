@@ -163,11 +163,21 @@ function update() {
         if ((keyboard.pressed("W") || keyboard.pressed("A") || keyboard.pressed("S") || keyboard.pressed("D"))) {
             var p = worldToMapCoordinates(v);
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
-                var t = numberToType[mapSuperior[p.x][p.z]];
-                if (t !== 'block' && !v.equals(player.player_object.position)) {
+                var tSup = numberToType[mapSuperior[p.x][p.z]];
+                var tInf = numberToType[mapInferior[p.x][p.z]];
+                if (tSup !== 'block' && !v.equals(player.player_object.position) &&  tInf !== 'empty') {
                     player.player_object.translateZ(-moveDistance);
                     mapSuperior[currentPos.x][currentPos.z] = 0;
                     mapSuperior[p.x][p.z] = 5;
+                }                
+                else if (tInf === 'empty'){                    
+                    player.player_object.translateY(-9);
+                    var timer = setInterval(function (){
+                        $('#status').html("Tu faleceste!");
+                        $('#instruction').html("Atualize a p&aacute;gina para tentar novamente");
+                        cancelAnimationFrame(id);
+                    },2000);
+                    
                 }
             }
         }
@@ -470,7 +480,7 @@ function loadFloor() {
 
     holeTexture = new THREE.ImageUtils.loadTexture('obj/floor/hole.jpg');
     holeTexture.wrapS = holeTexture.wrapT = THREE.RepeatWrapping;
-    holeTexture.repeat.set(10, 10);
+    holeTexture.repeat.set(1, 1);
     holeMaterial = new THREE.MeshBasicMaterial({
         map: holeTexture,
         side: THREE.DoubleSide
@@ -478,7 +488,7 @@ function loadFloor() {
 
     crackTexture = new THREE.ImageUtils.loadTexture('obj/floor/crack.jpg');
     crackTexture.wrapS = crackTexture.wrapT = THREE.RepeatWrapping;
-    crackTexture.repeat.set(10, 10);
+    crackTexture.repeat.set(1, 1);
     crackMaterial = new THREE.MeshBasicMaterial({
         map: crackTexture,
         side: THREE.DoubleSide
