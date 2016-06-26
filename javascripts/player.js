@@ -81,7 +81,7 @@ var Player = function() {
 		that.player_object = object;
 
 		scene.add(that.player_object);
-                activeCamera = 3;
+                activeCamera = 2;
 	};
 
 	

@@ -1,5 +1,5 @@
 //globais
-var activeCamera = 0;
+var activeCamera = 1;
 var clock = new THREE.Clock();
 var fpCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 500); //(viewangle, aspect, near, far)
 var chaseCamera = new THREE.PerspectiveCamera(45, 800 / 600, .1, 1200); //(viewangle, aspect, near, far)
@@ -172,8 +172,7 @@ function update() {
                 var tInf = numberToType[mapInferior[p.x][p.z]];
                 if (tSup !== 'block' && !v.equals(player.player_object.position) &&  tInf !== 'empty') {
                     player.player_object.translateZ(-moveDistance);
-                    mapSuperior[currentPos.x][currentPos.z] = 0;
-                    mapSuperior[p.x][p.z] = 5;
+                   
                 }                
                 else if (tInf === 'empty'){//hit the water                    
                     player.player_object.translateY(-12);
@@ -371,21 +370,7 @@ function update() {
         chaseCamera.position.y = cameraOffset.y;
         chaseCamera.position.z = cameraOffset.z;
         chaseCamera.lookAt(player.player_object.position);
-    }
-
-    // if(keyboard.pressed(" ")){
-    //     var pos = worldToMapCoordinates(player.player_object.position);
-    //     if(numberToType[mapSuperior[pos.x][pos.z]] === 'hole'){
-    //         var direction = player.getLookingAt();
-    //         switch(direction){
-    //             case 'up':
-    //                 for(var i = pos.z;i>=0;--i){
-
-    //                 }
-    //                 break;
-    //         }
-    //     }        
-    // } 
+    }    
        
     stats.update();
 }
@@ -455,42 +440,42 @@ function moveMonster() {
             var p = worldToMapCoordinates(v_enemy[i]);
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
                 var t = numberToType[mapSuperior[p.x][p.z]];
-                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
+                if ((t !== 'block' && t !== 'hole' && t !== 'crack') && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
                     enemies[i].monster_object.translateZ(-(enemy_moveDistance + 1.25));
                     mapSuperior[currentPos.x][currentPos.z] = 0;
-                    mapSuperior[p.x][p.z] = 5;
+                    mapSuperior[p.x][p.z] = 4;
                 }
             }
         } else if (options[option] == 'down') {
 
             monsters_pos[i] = worldToMapCoordinates(enemies[i].monster_object.position);
             v_enemy[i] = new THREE.Vector3(0, 0, 0);
-            v_enemy[i] = v_enemy[i].set(0, 0, -enemy_moveDistance);
+            v_enemy[i] = v_enemy[i].set(0, 0, enemy_moveDistance);
             v_enemy[i] = v_enemy[i].add(enemies[i].monster_object.position);
 
             var p = worldToMapCoordinates(v_enemy[i]);
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
                 var t = numberToType[mapSuperior[p.x][p.z]];
-                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
+                if ((t !== 'block' && t !== 'hole' && t !== 'crack') && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
                     enemies[i].monster_object.translateZ(enemy_moveDistance);
                     mapSuperior[currentPos.x][currentPos.z] = 0;
-                    mapSuperior[p.x][p.z] = 5;
+                    mapSuperior[p.x][p.z] = 4;
                 }
             }
         } else if (options[option] == 'left') {
 
             monsters_pos[i] = worldToMapCoordinates(enemies[i].monster_object.position);
             v_enemy[i] = new THREE.Vector3(0, 0, 0);
-            v_enemy[i] = v_enemy[i].set(0, 0, -enemy_moveDistance);
+            v_enemy[i] = v_enemy[i].set(-enemy_moveDistance, 0, 0);
             v_enemy[i] = v_enemy[i].add(enemies[i].monster_object.position);
 
             var p = worldToMapCoordinates(v_enemy[i]);
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
                 var t = numberToType[mapSuperior[p.x][p.z]];
-                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
+                if ((t !== 'block' && t !== 'hole' && t !== 'crack') && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
                     enemies[i].monster_object.translateX(-enemy_moveDistance);
                     mapSuperior[currentPos.x][currentPos.z] = 0;
-                    mapSuperior[p.x][p.z] = 5;
+                    mapSuperior[p.x][p.z] = 4;
                 }
             }
 
@@ -498,16 +483,16 @@ function moveMonster() {
 
             monsters_pos[i] = worldToMapCoordinates(enemies[i].monster_object.position);
             v_enemy[i] = new THREE.Vector3(0, 0, 0);
-            v_enemy[i] = v_enemy[i].set(0, 0, -enemy_moveDistance);
+            v_enemy[i] = v_enemy[i].set(enemy_moveDistance, 0, 0);
             v_enemy[i] = v_enemy[i].add(enemies[i].monster_object.position);
 
             var p = worldToMapCoordinates(v_enemy[i]);
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
                 var t = numberToType[mapSuperior[p.x][p.z]];
-                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
+                if ((t !== 'block' && t !== 'hole' && t !== 'crack') && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
                     enemies[i].monster_object.translateX(enemy_moveDistance);
                     mapSuperior[currentPos.x][currentPos.z] = 0;
-                    mapSuperior[p.x][p.z] = 5;
+                    mapSuperior[p.x][p.z] = 4;
                 }
             }
         }
@@ -635,6 +620,7 @@ function setMapObject(i, j, k) {
                 player.init(x, 10, z);
                 fpCamera.position.x = x;
                 fpCamera.position.z = z;
+                mapSuperior[i][j] = 0;
                 break;
             case 'hole':
                 floor[i][j] = new THREE.Mesh(floorGeometry, holeMaterial);
@@ -653,6 +639,7 @@ function setMapObject(i, j, k) {
                 scene.add(floor[i][j]);
                 break;
             case 'enemy':
+                mapSuperior[i][j] = 0;
                 if (enemies.length < 5) {
                     enemies[enemiesCounter] = new Monster();
                     enemies[enemiesCounter++].init(x, 4, z);
