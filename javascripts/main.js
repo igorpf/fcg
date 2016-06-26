@@ -159,6 +159,17 @@ function update() {
             fpCamera.rotation.y = player.player_object.rotation.y;
             fpCamera.position.x = player.player_object.position.x + 10;
         }
+
+        if (keyboard.pressed("V")) {
+            if (activeCamera == 1) {
+                activeCamera = 2;
+            } else if (activeCamera == 2) {
+                activeCamera = 3;
+            } else if (activeCamera == 3) {
+                activeCamera = 1;
+            }
+        }
+
         //Avoids the moviment when a keyboard hasn't been pressed
         if ((keyboard.pressed("W") || keyboard.pressed("A") || keyboard.pressed("S") || keyboard.pressed("D"))) {
             var p = worldToMapCoordinates(v);
@@ -207,6 +218,94 @@ function update() {
         //     }
         // }
 
+
+        if (keyboard.pressed("F")) {
+            var direction = player.getLookingAt();
+            for (i = 0; i < enemies.length; i++) {
+                if (player_bbox.position.x >= collidableMeshList[i].position.x) {
+                    if (player_bbox.position.x - collidableMeshList[i].position.x > 6 &&
+                        player_bbox.position.x - collidableMeshList[i].position.x <= 15) {
+                        if (player_bbox.position.z >= collidableMeshList[i].position.z) {
+                            if (player_bbox.position.z - collidableMeshList[i].position.z > 6 &&
+                                player_bbox.position.z - collidableMeshList[i].position.z <= 20) {
+
+                                if (direction == "up") {
+                                    enemies[i].monster_object.translateZ(-20);
+
+                                } else if (direction == "down") {
+                                    enemies[i].monster_object.translateZ(20);
+                                } else if (direction == "left") {
+                                    enemies[i].monster_object.translateX(-20);
+
+                                } else if (direction == "right") {
+                                    enemies[i].monster_object.translateX(20);
+
+                                }
+
+                            }
+                        } else {
+                            if (collidableMeshList[i].position.z - player_bbox.position.z > 6 &&
+                                collidableMeshList[i].position.z - player_bbox.position.z <= 20) {
+                                if (direction == "up") {
+                                    enemies[i].monster_object.translateZ(-20);
+
+                                } else if (direction == "down") {
+                                    enemies[i].monster_object.translateZ(20);
+                                } else if (direction == "left") {
+                                    enemies[i].monster_object.translateX(-20);
+
+                                } else if (direction == "right") {
+                                    enemies[i].monster_object.translateX(20);
+
+                                }
+
+                            }
+
+                        }
+                    }
+                } else {
+                    if (collidableMeshList[i].position.x - player_bbox.position.x > 6 &&
+                        collidableMeshList[i].position.x - player_bbox.position.x <= 20) {
+                        if (collidableMeshList[i].position.z > player_bbox.position.z) {
+                            if (collidableMeshList[i].position.z - player_bbox.position.z > 6&&
+                                collidableMeshList[i].position.z - player_bbox.position.z <= 20) {
+                                if (direction == "up") {
+                                    enemies[i].monster_object.translateZ(-20);
+
+                                } else if (direction == "down") {
+                                    enemies[i].monster_object.translateZ(20);
+                                } else if (direction == "left") {
+                                    enemies[i].monster_object.translateX(-20);
+
+                                } else if (direction == "right") {
+                                    enemies[i].monster_object.translateX(20);
+
+                                }
+                            }
+                        } else {
+                            if (player_bbox.position.z - collidableMeshList[i].position.z > 6 &&
+                                player_bbox.position.z - collidableMeshList[i].position.z <= 20) {
+                                if (direction == "up") {
+                                    enemies[i].monster_object.translateZ(-20);
+
+                                } else if (direction == "down") {
+                                    enemies[i].monster_object.translateZ(20);
+                                } else if (direction == "left") {
+                                    enemies[i].monster_object.translateX(-20);
+
+                                } else if (direction == "right") {
+                                    enemies[i].monster_object.translateX(20);
+
+                                }
+
+                            }
+                        }
+
+                    }
+                }
+
+            }
+        }
 
         for (i = 0; i < enemies.length; i++) {
             if (player_bbox.position.x >= collidableMeshList[i].position.x) {
