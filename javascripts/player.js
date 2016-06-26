@@ -16,6 +16,8 @@ var Player = function() {
 		'down': false
 	};
 
+	var looking_at;
+
 
 	that.init = function(x, y, z) {
 		that.setPosx(x);
@@ -224,8 +226,13 @@ var Player = function() {
 		return looking;
 	};
 
-	that.getLookingAt = function(direction){
-		return looking[direction];
+	that.getLookingAt = function(){
+		Object.keys(looking).forEach(function(direction){
+			if(looking[direction] == true){
+				looking_at = direction;
+			}
+		});
+		return looking_at;
 	};
 
 
