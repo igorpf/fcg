@@ -164,7 +164,7 @@ function update() {
             activeCamera=(activeCamera+1)%3;
         }
 
-        //Avoids the moviment when a keyboard hasn't been pressed
+        //Avoids the movement when a keyboard hasn't been pressed
         if ((keyboard.pressed("W") || keyboard.pressed("A") || keyboard.pressed("S") || keyboard.pressed("D"))) {
             var p = worldToMapCoordinates(v);
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
@@ -175,7 +175,7 @@ function update() {
                     mapSuperior[currentPos.x][currentPos.z] = 0;
                     mapSuperior[p.x][p.z] = 5;
                 }                
-                else if (tInf === 'empty'){                    
+                else if (tInf === 'empty'){//hit the water                    
                     player.player_object.translateY(-12);
                     var timer = setTimeout(function (){
                         $('#status').html("Tu faleceste!");
@@ -317,6 +317,12 @@ function update() {
                     scene.remove(m[0].monster_object);                                        
                 }
             }
+            if(enemies.length===0)
+                var timer = setTimeout(function (){
+                                    $('#status').html("Ganhaste o jogo!");
+                                    $('#instruction').html("Atualize a p&aacute;gina para tentar novamente");
+                                    cancelAnimationFrame(id);
+                                },2000);
         }
 
         for (i = 0; i < enemies.length; i++) {
@@ -367,14 +373,20 @@ function update() {
         chaseCamera.lookAt(player.player_object.position);
     }
 
+    // if(keyboard.pressed(" ")){
+    //     var pos = worldToMapCoordinates(player.player_object.position);
+    //     if(numberToType[mapSuperior[pos.x][pos.z]] === 'hole'){
+    //         var direction = player.getLookingAt();
+    //         switch(direction){
+    //             case 'up':
+    //                 for(var i = pos.z;i>=0;--i){
 
-
-
-    
-
-
-
-    //    controls.update();
+    //                 }
+    //                 break;
+    //         }
+    //     }        
+    // } 
+       
     stats.update();
 }
 
@@ -443,7 +455,7 @@ function moveMonster() {
             var p = worldToMapCoordinates(v_enemy[i]);
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
                 var t = numberToType[mapSuperior[p.x][p.z]];
-                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position)) {
+                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
                     enemies[i].monster_object.translateZ(-(enemy_moveDistance + 1.25));
                     mapSuperior[currentPos.x][currentPos.z] = 0;
                     mapSuperior[p.x][p.z] = 5;
@@ -459,7 +471,7 @@ function moveMonster() {
             var p = worldToMapCoordinates(v_enemy[i]);
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
                 var t = numberToType[mapSuperior[p.x][p.z]];
-                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position)) {
+                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
                     enemies[i].monster_object.translateZ(enemy_moveDistance);
                     mapSuperior[currentPos.x][currentPos.z] = 0;
                     mapSuperior[p.x][p.z] = 5;
@@ -475,7 +487,7 @@ function moveMonster() {
             var p = worldToMapCoordinates(v_enemy[i]);
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
                 var t = numberToType[mapSuperior[p.x][p.z]];
-                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position)) {
+                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
                     enemies[i].monster_object.translateX(-enemy_moveDistance);
                     mapSuperior[currentPos.x][currentPos.z] = 0;
                     mapSuperior[p.x][p.z] = 5;
@@ -492,7 +504,7 @@ function moveMonster() {
             var p = worldToMapCoordinates(v_enemy[i]);
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
                 var t = numberToType[mapSuperior[p.x][p.z]];
-                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position)) {
+                if (t !== 'block' && !v_enemy[i].equals(enemies[i].monster_object.position) && mapInferior[p.x][p.z] !== 0) {
                     enemies[i].monster_object.translateX(enemy_moveDistance);
                     mapSuperior[currentPos.x][currentPos.z] = 0;
                     mapSuperior[p.x][p.z] = 5;
@@ -558,7 +570,7 @@ function initializeDictionaries() {
 function loadFloor() {
     grassTexture = new THREE.ImageUtils.loadTexture('obj/floor/grass.jpg');
     grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
-    grassTexture.repeat.set(10, 10);
+    grassTexture.repeat.set(1, 1);
     grassMaterial = new THREE.MeshBasicMaterial({
         map: grassTexture,
         side: THREE.DoubleSide
@@ -566,7 +578,7 @@ function loadFloor() {
 
     waterTexture = new THREE.ImageUtils.loadTexture('obj/floor/water.jpg');
     waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;
-    waterTexture.repeat.set(10, 10);
+    waterTexture.repeat.set(1, 1);
     waterMaterial = new THREE.MeshBasicMaterial({
         map: waterTexture,
         side: THREE.DoubleSide
