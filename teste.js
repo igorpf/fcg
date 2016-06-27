@@ -1,3 +1,19 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Gist
+ @joner1992
+ Unwatch 2
+  Star 0
+  Fork 0 igorpf/fcg
+ Code  Issues 0  Pull requests 0  Wiki  Pulse  Graphs
+Branch: features/igor Find file Copy pathfcg/javascripts/main.js
+63c54fa  24 minutes ago
+@igorpf igorpf Limitando movimento do inimigo
+2 contributors @igorpf @joner1992
+RawBlameHistory    659 lines (564 sloc)  26.3 KB
 //globais
 var activeCamera = 1;
 var clock = new THREE.Clock();
@@ -8,8 +24,7 @@ var mini_ortoCamera = new THREE.OrthographicCamera(10, 800 / 2, 0, 780 / -2, 1, 
 var keyboard = new THREEx.KeyboardState();
 var axis = new THREE.AxisHelper(10);
 var scene, renderer;
-var player = new Player();
-var controls;
+var player, controls;
 var floor; //geometry/texture 
 var floorGeometry;
 var grassMaterial, grassTexture, waterMaterial, waterTexture;
@@ -28,7 +43,8 @@ var enemies = [],
     enemiesCounter = 0;
 
 var id;
-var listener = new THREE.AudioListener();
+
+
 
 /*initalization (THIS MUST BE MADE GLOBALLY)*/
 mapInferior = new Array(size);
@@ -65,6 +81,7 @@ function init() {
     ortoCamera.position.x = 0;
     ortoCamera.position.y = 100;
     ortoCamera.position.z = 0;
+    //TODO: fazer a camera se mexer conforme o boneco mexe
     chaseCamera.position.x = 0;
     chaseCamera.position.y = 0;
     chaseCamera.position.z = 40;
@@ -76,11 +93,7 @@ function init() {
     stats = new Stats();
     container.append(stats.dom);
 
-    chaseCamera.add(listener);
-    ortoCamera.add(listener);
-    fpCamera.add(listener);
 
-    var audioLoader = new THREE.AudioLoader();
     // scene
     scene = new THREE.Scene();
 
@@ -91,6 +104,7 @@ function init() {
     var directionalLight = new THREE.DirectionalLight(0xffeedd);
     directionalLight.position.set(0, 0, 1).normalize();
     scene.add(directionalLight);
+    player = new Player();
 
     var spotlight = new THREE.SpotLight(0xffffff);
     spotlight.position.set(-60, 150, -30);
@@ -100,15 +114,6 @@ function init() {
     // must enable shadow casting ability for the light
     spotlight.castShadow = true;
     scene.add(spotlight);
-
-    var sound = new THREE.Audio(listener);
-    audioLoader.load('sounds/bad_cat_master.ogg', function(buffer) {
-        sound.setBuffer(buffer);
-        sound.setLoop(true);
-        sound.setVolume(0.1);
-        sound.play();
-    });
-
 
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x000000);
@@ -138,7 +143,6 @@ function update() {
     var delta = clock.getDelta();
     var moveDistance = 50 * delta;
     var enemy_moveDistance = 25 * delta;
-
 
     if (player.player_object !== undefined) {
         var currentPos = worldToMapCoordinates(player.player_object.position);
@@ -173,7 +177,7 @@ function update() {
         }
 
         if (keyboard.pressed("V")) {
-            activeCamera = (activeCamera + 1) % 3;
+            activeCamera=(activeCamera+1)%3;
         }
 
         //Avoids the movement when a keyboard hasn't been pressed
@@ -182,21 +186,21 @@ function update() {
             if (p.x >= 0 && p.x < mapSuperior.length && p.z >= 0 && p.z < mapSuperior.length) { //move only inside the map bounds
                 var tSup = numberToType[mapSuperior[p.x][p.z]];
                 var tInf = numberToType[mapInferior[p.x][p.z]];
-                if (tSup !== 'block' && !v.equals(player.player_object.position) && tInf !== 'empty') {
+                if (tSup !== 'block' && !v.equals(player.player_object.position) &&  tInf !== 'empty') {
                     player.player_object.translateZ(-moveDistance);
-
-                } else if (tInf === 'empty') { //hit the water                    
+                   
+                }                
+                else if (tInf === 'empty'){//hit the water                    
                     player.player_object.translateY(-12);
-                    var timer = setTimeout(function() {
+                    var timer = setTimeout(function (){
                         $('#status').html("Tu faleceste!");
                         $('#instruction').html("Atualize a p&aacute;gina para tentar novamente");
                         cancelAnimationFrame(id);
-                    }, 2000);
-
+                    },2000);
+                    
                 }
             }
         }
-
         var wireMaterial = new THREE.MeshBasicMaterial({
             color: 0xff0000,
             wireframe: true
@@ -217,15 +221,22 @@ function update() {
         player_bbox.position.x = player.player_object.position.x;
         player_bbox.position.y = 4;
         player_bbox.position.z = player.player_object.position.z;
+        var originPoint = player_bbox.position.clone();
 
 
+        // for (var vertexIndex = 0; vertexIndex < player_bbox.geometry.vertices.length; vertexIndex++) {
+        //     var localVertex = player_bbox.geometry.vertices[vertexIndex].clone();
+        //     var globalVertex = localVertex.applyMatrix4(player_bbox.matrix);
+        //     var directionVector = globalVertex.sub(player_bbox.position);
 
-        var relativeCameraOffset = new THREE.Vector3(150, 150, 150);
-        var cameraOffset = relativeCameraOffset.add(player.player_object.position);
-        chaseCamera.position.x = cameraOffset.x;
-        chaseCamera.position.y = cameraOffset.y;
-        chaseCamera.position.z = cameraOffset.z;
-        chaseCamera.lookAt(player.player_object.position);
+        //     var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
+        //     var collisionResults = ray.intersectObjects(collidableMeshList);
+        //     if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()){
+        //         cancelAnimationFrame(id);
+
+        //     }
+        // }
+
 
         if (keyboard.pressed("F")) {
             var direction = player.getLookingAt();
@@ -276,7 +287,7 @@ function update() {
                     if (collidableMeshList[i].position.x - player_bbox.position.x > 6 &&
                         collidableMeshList[i].position.x - player_bbox.position.x <= 20) {
                         if (collidableMeshList[i].position.z > player_bbox.position.z) {
-                            if (collidableMeshList[i].position.z - player_bbox.position.z > 6 &&
+                            if (collidableMeshList[i].position.z - player_bbox.position.z > 6&&
                                 collidableMeshList[i].position.z - player_bbox.position.z <= 20) {
                                 if (direction == "up") {
                                     enemies[i].monster_object.translateZ(-20);
@@ -313,22 +324,21 @@ function update() {
 
                     }
                 }
-
+                
                 var mPos = worldToMapCoordinates(enemies[i].monster_object.position);
-                if (moved && numberToType[mapInferior[mPos.x][mPos.z]] === 'empty') {
-                    enemies[i].monster_object.translateY(-12);
+                if(moved && numberToType[mapInferior[mPos.x][mPos.z]] === 'empty'){
+                    enemies[i].monster_object.translateY(-12);                     
                     var m = enemies.splice(i, 1);
-                    scene.remove(m[0].monster_object);
+                    scene.remove(m[0].monster_object);                                        
                 }
             }
-            if (enemies.length === 0)
-                var timer = setTimeout(function() {
-                    $('#status').html("Ganhaste o jogo!");
-                    $('#instruction').html("Atualize a p&aacute;gina para tentar novamente");
-                    cancelAnimationFrame(id);
-                }, 2000);
+            if(enemies.length===0)
+                var timer = setTimeout(function (){
+                                    $('#status').html("Ganhaste o jogo!");
+                                    $('#instruction').html("Atualize a p&aacute;gina para tentar novamente");
+                                    cancelAnimationFrame(id);
+                                },2000);
         }
-
 
         for (i = 0; i < enemies.length; i++) {
             if (player_bbox.position.x >= collidableMeshList[i].position.x) {
@@ -368,25 +378,16 @@ function update() {
             }
 
         }
+
+
         var relativeCameraOffset = new THREE.Vector3(150, 150, 150);
         var cameraOffset = relativeCameraOffset.add(player.player_object.position);
         chaseCamera.position.x = cameraOffset.x;
         chaseCamera.position.y = cameraOffset.y;
         chaseCamera.position.z = cameraOffset.z;
         chaseCamera.lookAt(player.player_object.position);
-    }
-
-    if (keyboard.pressed("1")) {
-        activeCamera = 0;
-    }
-    if (keyboard.pressed("2")) {
-        activeCamera = 1;
-    }
-    if (keyboard.pressed("3")) {
-        activeCamera = 2;
-    }
-
-
+    }    
+       
     stats.update();
 }
 
@@ -427,12 +428,11 @@ function render() {
 
 function animate() {
     id = requestAnimationFrame(animate);
-    //moveMonster();
+    moveMonster();
     render();
     update();
 }
 
-var movements = setInterval(moveMonster, 100);
 /* --------------------- DUMMY MOVE ------------------------------------------*/
 // movements for dummy monsters 
 function moveMonster() {
@@ -530,8 +530,6 @@ function handleFiles(e) {
     reader.addEventListener("load",
         processimage, false);
     reader.readAsArrayBuffer(file);
-
-
 }
 
 function processimage(e) {
@@ -571,7 +569,7 @@ function initializeDictionaries() {
 }
 
 function loadFloor() {
-    grassTexture = new THREE.ImageUtils.loadTexture('obj/floor/dark_grass.jpg');
+    grassTexture = new THREE.ImageUtils.loadTexture('obj/floor/grass.jpg');
     grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
     grassTexture.repeat.set(1, 1);
     grassMaterial = new THREE.MeshBasicMaterial({
@@ -675,3 +673,5 @@ function setMapObject(i, j, k) {
 
 
 $('#document').ready(mainLoop);
+Status API Training Shop Blog About
+© 2016 GitHub, Inc. Terms Privacy Security Contact Help
